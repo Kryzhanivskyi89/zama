@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Probability Twist Wheel — Zama FHEVM</title>
+  <style>
+  :root {
+    --bg-main: #05020d;
+    --bg-panel: #0a061a;
+    --bg-panel-soft: #100825;
+    --border-soft: rgba(254, 176, 127, 0.3);
+    --text-primary: #fef9ff;
+    --text-secondary: #fbb6ce;
+    --accent-orange: #f97316;
+    --accent-pink: #f43f5e;
+    --accent-yellow: #facc15;
+    --accent-mint: #4ade80;
+    --radius-lg: 18px;
+    --radius-md: 10px;
+    --shadow-soft: 0 26px 70px rgba(0, 0, 0, 0.95);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    padding: 30px 16px 22px;
+    background:
+      radial-gradient(circle at 10% 0, rgba(248, 113, 113, 0.45) 0, transparent 55%),
+      radial-gradient(circle at 90% 90%, rgba(251, 191, 36, 0.4) 0, transparent 55%),
+      radial-gradient(circle at 50% 20%, rgba(248, 113, 113, 0.25) 0, transparent 60%),
+      radial-gradient(circle at 50% 80%, rgba(244, 63, 94, 0.35) 0, transparent 65%),
+      #020016;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 0, rgba(251, 191, 36, 0.35) 0, transparent 60%),
+      linear-gradient(135deg, rgba(244, 63, 94, 0.5), transparent 40%, transparent 60%, rgba(248, 250, 252, 0.2));
+    mix-blend-mode: screen;
+    opacity: 0.7;
+  }
+
+  .app-shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 920px;
+  }
+
+  /* Header: аркадне колесо */
+
+  .app-header {
+    margin-bottom: 20px;
+    padding: 16px 18px 14px;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 0 0, rgba(249, 115, 22, 0.6) 0, transparent 55%),
+      radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.7) 0, transparent 55%),
+      #080113;
+    border: 1px solid rgba(254, 202, 202, 0.4);
+    box-shadow:
+      0 26px 70px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(15, 23, 42, 0.9);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background:
+      conic-gradient(from 210deg, #facc15, #f97316, #f43f5e, #fb7185, #facc15);
+    box-shadow:
+      0 0 26px rgba(252, 211, 77, 0.95),
+      0 0 0 4px rgba(24, 16, 32, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #1f2933;
+  }
+
+  .header-main {
+    min-width: 0;
+  }
+
+  .app-title {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .app-subtitle {
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: #ffe4e6;
+  }
+
+  .header-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(254, 202, 202, 0.8);
+    background: rgba(15, 23, 42, 0.96);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #fee2e2;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  @media screen and (max-width: 640px) {
+    .app-header {
+      grid-template-columns: auto 1fr;
+      grid-template-rows: auto auto;
+      row-gap: 8px;
+      border-radius: 24px;
+    }
+
+    .header-pill {
+      grid-column: 1 / -1;
+      justify-self: flex-start;
+    }
+  }
+
+  @media screen and (min-width: 720px) {
+    body {
+      padding: 38px 26px 24px;
+    }
+
+    .app-title {
+      font-size: 22px;
+    }
+
+    .app-subtitle {
+      font-size: 13px;
+    }
+  }
+
+  /* Layout: зліва кроки, справа — візуалізація колеса */
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+    gap: 16px;
+  }
+
+  @media screen and (max-width: 860px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Cards */
+
+  .card {
+    background:
+      radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.12) 0, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(248, 113, 113, 0.16) 0, transparent 55%),
+      var(--bg-panel);
+    padding: 14px 16px 12px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 12px;
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+  }
+
+  .card--intro {
+    margin-bottom: 16px;
+  }
+
+  .card-header-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .card h1,
+  .card h2 {
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .card h2 span.step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    margin-right: 6px;
+    border: 1px solid rgba(254, 202, 202, 0.7);
+    font-size: 11px;
+    font-weight: 700;
+    color: #fee2e2;
+  }
+
+  .card-tag {
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(254, 202, 202, 0.6);
+    background: rgba(24, 16, 32, 0.96);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fed7e2;
+    white-space: nowrap;
+  }
+
+  .card-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .card-meta {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #fecaca;
+  }
+
+  code {
+    background: rgba(24, 16, 32, 0.96);
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(254, 202, 202, 0.6);
+    font-size: 11px;
+  }
+
+  /* Form elements */
+
+  label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    color: #fecaca;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  input,
+  button,
+  select {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(127, 29, 29, 0.7);
+    background:
+      radial-gradient(circle at 0 0, rgba(248, 113, 113, 0.2) 0, transparent 60%),
+      #030112;
+    color: var(--text-primary);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.1s ease;
+  }
+
+  input::placeholder {
+    color: rgba(248, 209, 214, 0.65);
+  }
+
+  input:focus-visible,
+  select:focus-visible {
+    border-color: var(--accent-pink);
+    box-shadow:
+      0 0 0 1px rgba(244, 63, 94, 0.9),
+      0 0 20px rgba(248, 113, 113, 0.75);
+    background: #02000a;
+  }
+
+  .row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Buttons */
+
+  button.btn {
+    cursor: pointer;
+    border: none;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-size: 11px;
+    color: #020617;
+    background: linear-gradient(120deg, var(--accent-orange), var(--accent-pink), #fb7185);
+    background-size: 220% 220%;
+    box-shadow:
+      0 16px 36px rgba(248, 113, 113, 0.85),
+      0 1px 0 rgba(254, 242, 242, 0.95);
+    position: relative;
+    overflow: hidden;
+  }
+
+  button.btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.45), transparent 55%, transparent);
+    opacity: 0;
+    transform: translateX(-40%);
+    transition: opacity 0.2s ease, transform 0.35s ease;
+    pointer-events: none;
+  }
+
+  button.btn:hover::before {
+    opacity: 1;
+    transform: translateX(40%);
+  }
+
+  button.btn:hover {
+    transform: translateY(-1px);
+    background-position: 100% 0;
+    box-shadow:
+      0 20px 44px rgba(248, 113, 113, 1),
+      0 1px 0 rgba(254, 242, 242, 0.95);
+  }
+
+  button.btn:active {
+    transform: translateY(0);
+    box-shadow:
+      0 10px 26px rgba(248, 113, 113, 0.85),
+      0 1px 0 rgba(254, 242, 242, 0.95);
+  }
+
+  button.btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+    box-shadow:
+      0 6px 18px rgba(127, 29, 29, 0.7),
+      0 1px 0 rgba(254, 242, 242, 0.95);
+  }
+
+  /* Status & result */
+
+  .status {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #fecaca;
+  }
+
+  .status::before {
+    content: "• ";
+    color: #fed7aa;
+  }
+
+  .result {
+    margin-top: 12px;
+    padding: 12px 12px 10px;
+    border-radius: var(--radius-md);
+    background:
+      radial-gradient(circle at 0 0, rgba(234, 179, 8, 0.25) 0, transparent 60%),
+      #02000b;
+    border: 1px solid rgba(251, 191, 36, 0.8);
+    font-size: 13px;
+  }
+
+  pre {
+    background: rgba(15, 23, 42, 0.96);
+    padding: 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(248, 113, 113, 0.65);
+    overflow: auto;
+    font-size: 12px;
+    color: #fee2e2;
+  }
+
+  /* Sidebar: wheel visual & outcome legend */
+
+  .wheel-panel {
+    background:
+      radial-gradient(circle at 50% 0, rgba(254, 249, 195, 0.16) 0, transparent 60%),
+      var(--bg-panel-soft);
+    padding: 14px 16px 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .wheel-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+
+  .wheel-subtitle {
+    font-size: 11px;
+    color: #fecaca;
+    margin: 0 0 10px;
+  }
+
+  .wheel-wrap {
+    margin-top: 6px;
+    display: grid;
+    grid-template-columns: auto;
+    justify-content: center;
+    row-gap: 10px;
+  }
+
+  .wheel {
+    width: 170px;
+    height: 170px;
+    border-radius: 999px;
+    margin: 0 auto;
+    background:
+      conic-gradient(
+        from 270deg,
+        rgba(248, 113, 113, 0.95) 0 80deg,
+        rgba(252, 211, 77, 0.95) 80deg 180deg,
+        rgba(34, 197, 94, 0.95) 180deg 280deg,
+        rgba(148, 163, 184, 0.9) 280deg 360deg
+      );
+    box-shadow:
+      0 0 40px rgba(248, 113, 113, 0.95),
+      0 0 0 6px rgba(15, 23, 42, 0.95);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wheel::before {
+    content: "";
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 30% 20%, #ffffff 0, #fee2e2 28%, #f97316 90%);
+    box-shadow:
+      0 0 22px rgba(248, 113, 113, 0.9),
+      0 0 0 3px rgba(15, 23, 42, 0.9);
+  }
+
+  .wheel-pointer {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 24px;
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    background: linear-gradient(to bottom, #fef9c3, #f97316);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+  }
+
+  .risk-meter {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+    font-size: 11px;
+    color: #fee2e2;
+  }
+
+  .risk-track {
+    position: relative;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(to right, #22c55e, #facc15, #f97316, #f43f5e);
+    overflow: hidden;
+  }
+
+  .risk-track::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.9);
+  }
+
+  .risk-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .outcome-legend {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .legend-pill {
+    padding: 6px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(254, 215, 170, 0.8);
+    background: rgba(15, 23, 42, 0.95);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .legend-pill span.label {
+    font-weight: 600;
+  }
+
+  .legend-pill span.note {
+    font-size: 9px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #fee2e2;
+  }
+
+  .legend-pill--lose {
+    border-color: rgba(254, 202, 202, 0.9);
+  }
+
+  .legend-pill--small {
+    border-color: rgba(254, 249, 195, 0.9);
+  }
+
+  .legend-pill--big {
+    border-color: rgba(187, 247, 208, 0.9);
+  }
+
+  @media screen and (max-width: 400px) {
+    .wheel {
+      width: 150px;
+      height: 150px;
+    }
+  }
+
+  /* Footer */
+
+  footer {
+    margin-top: 16px;
+    color: #fecaca;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  footer code {
+    border-radius: 999px;
+    padding-inline: 8px;
+  }
+</style>
+
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="header-icon">🎡</div>
+      <div class="header-main">
+        <h1 class="app-title">Probability Twist Wheel</h1>
+        <p class="app-subtitle">
+          Stake a secret risk, spin a hidden random, reveal only win / lose and payout tier.
+        </p>
+      </div>
+      <div class="header-pill">Encrypted spin · FHEVM</div>
+    </header>
+
+    <div class="layout">
+      <div>
+        <div class="card card--intro">
+          <div class="card-header-line">
+            <h1>Spin Flow</h1>
+            <span class="card-tag">Session setup</span>
+          </div>
+          <p class="card-desc">
+            Connect your wallet, choose a stake, let the relayer encrypt the random spin,
+            and the contract decides the outcome.
+          </p>
+          <p class="card-meta">
+            Local whitepaper: <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+          </p>
+          <div style="margin-top:10px;">
+            <button id="btnConnect" class="btn">Connect Wallet</button>
+            <div id="connectStatus" class="status"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">1</span>Submit Encrypted Stake</h2>
+            <span class="card-tag">Player choice</span>
+          </div>
+          <p class="card-desc">
+            Pick how risky your spin is (0–100). Only the encrypted stake reaches the contract.
+          </p>
+
+          <label>Risk stake (0–100)</label>
+          <input id="stakeVal" type="number" min="0" max="100" value="30" />
+
+          <div class="row">
+            <button id="btnSubmitStake" class="btn">Encrypt &amp; Submit Stake</button>
+          </div>
+          <div id="stakeStatus" class="status"></div>
+          <pre id="stakeHandleOut" style="display:none;">—</pre>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">2</span>Generate &amp; Encrypt Random</h2>
+            <span class="card-tag">Relayer spin</span>
+          </div>
+          <p class="card-desc">
+            The front-end draws a random integer (0–99), relayer encrypts it, and you send it to compute outcome.
+          </p>
+
+          <div class="row">
+            <div class="col">
+              <button id="btnGenRand" class="btn">Generate Random &amp; Encrypt</button>
+            </div>
+            <div class="col">
+              <button id="btnComputeOutcome" class="btn">Compute Outcome</button>
+            </div>
+          </div>
+          <div id="randStatus" class="status"></div>
+          <pre id="randHandleOut" style="display:none;">—</pre>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">3</span>Make Outcome Public</h2>
+            <span class="card-tag">Opt‑in reveal</span>
+          </div>
+          <p class="card-desc">
+            Decide when to reveal the outcome code. The exact random and stake stay secret.
+          </p>
+
+          <div class="row">
+            <button id="btnMakePublic" class="btn">Make My Outcome Public</button>
+          </div>
+          <div id="makeStatus" class="status"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">4</span>Get &amp; Decrypt Outcome</h2>
+            <span class="card-tag">Public view</span>
+          </div>
+          <p class="card-desc">
+            Fetch the encrypted outcome for any address that opted in,
+            then run public decrypt to see win / lose and tier.
+          </p>
+
+          <label>Address to fetch outcome for</label>
+          <input id="fetchAddr" type="text" placeholder="0x..." />
+
+          <div class="row" style="margin-top:8px;">
+            <button id="btnGetHandle" class="btn">Get Outcome Handle</button>
+            <button id="btnDecrypt" class="btn">Public Decrypt</button>
+          </div>
+          <div id="decryptStatus" class="status"></div>
+          <div id="outcomeResult" class="result" style="display:none;"></div>
+        </div>
+      </div>
+
+      <aside class="wheel-panel">
+        <h3 class="wheel-title">Wheel snapshot</h3>
+        <p class="wheel-subtitle">
+          Visual intuition: low stake ⇒ safer slice; high stake ⇒ hotter win zones.
+        </p>
+
+        <div class="wheel-wrap">
+          <div class="wheel">
+            <div class="wheel-pointer"></div>
+          </div>
+
+          <div class="risk-meter">
+            <div class="risk-track"></div>
+            <div class="risk-labels">
+              <span>Safe</span>
+              <span>Spicy</span>
+              <span>All‑in</span>
+            </div>
+          </div>
+
+          <div class="outcome-legend">
+            <div class="legend-pill legend-pill--lose">
+              <span class="label">Code 0 · Lose</span>
+              <span class="note">Spin lands outside your risk slice.</span>
+            </div>
+            <div class="legend-pill legend-pill--small">
+              <span class="label">Code 1 · Small</span>
+              <span class="note">Win with smaller payout zone.</span>
+            </div>
+            <div class="legend-pill legend-pill--big">
+              <span class="label">Code 2 · Big</span>
+              <span class="note">High‑tier hit — biggest rewards.</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      All important logs in console. Relayer SDK 0.3.x required.
+    </footer>
+  </div>
+<script type="module">
+  import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+  import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+  // CONFIG: set your deployed contract address here
+  const CONTRACT_ADDRESS = "0xAE5c3F08C2eB9597aEB0b1C88007f74F0dbc9B03";
+  const RELAYER_URL = "https://relayer.testnet.zama.org";
+  const GATEWAY_URL = "https://gateway.testnet.zama.org";
+
+  const ABI = [
+    "function submitStake(bytes32, bytes) external",
+    "function computeOutcome(address, bytes32, bytes) external returns (bytes32)",
+    "function makeOutcomePublic() external",
+    "function outcomeHandle(address) external view returns (bytes32)",
+    "function hasOutcome(address) external view returns (bool)"
+  ];
+
+  // STATE
+  let provider, signer, userAddress, contract, relayer;
+  let lastRandomPlain = null;
+  let lastRandomHandle = null;
+
+  const $ = s => document.querySelector(s);
+  const log = (t, ...a) => console.log(`%c[${t}]`, "color:#7dd3fc;font-weight:700;", ...a);
+  const logErr = (t,...a) => console.error(`%c[ERR:${t}]`, "color:#fb7185;font-weight:700;", ...a);
+  const setStatus = (sel, txt) => { const el = $(sel); if (el) el.textContent = txt; };
+
+  // connect
+  async function connect() {
+    try {
+      log("connect", "starting");
+      if (!window.ethereum) throw new Error("No wallet (window.ethereum)");
+      provider = new BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = await provider.getSigner();
+      userAddress = await signer.getAddress();
+      log("wallet", userAddress);
+
+      contract = new Contract(getAddress(CONTRACT_ADDRESS), ABI, signer);
+      log("contract", CONTRACT_ADDRESS);
+
+      if (!relayer) {
+        await initSDK();
+        relayer = await createInstance({
+          ...SepoliaConfig,
+          relayerUrl: RELAYER_URL,
+          gatewayUrl: GATEWAY_URL,
+          network: window.ethereum,
+          debug: true
+        });
+        log("relayer", "initialized");
+      }
+
+      $("#btnConnect").textContent = `${userAddress.slice(0,6)}…${userAddress.slice(-4)}`;
+      setStatus("#connectStatus", `Connected: ${userAddress}`);
+      return true;
+    } catch (e) {
+      logErr("connect", e);
+      setStatus("#connectStatus", `Connect error: ${e.message || e}`);
+      return false;
+    }
+  }
+  $("#btnConnect").onclick = connect;
+
+  // helpers
+  function toHex(u8) {
+    if (!u8) return "";
+    if (typeof u8 === "string") return u8;
+    if (u8 instanceof Uint8Array || Array.isArray(u8)) {
+      return '0x' + Array.from(u8).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+    return String(u8);
+  }
+  function cleanHandle(raw) {
+    if (!raw) throw new Error("empty handle");
+    const s = String(raw).trim();
+    return s.split("\n").pop().trim();
+  }
+
+  // 1) submit stake
+  $("#btnSubmitStake").onclick = async () => {
+    try {
+      log("submitStake", "start");
+      setStatus("#stakeStatus", "Preparing...");
+      if (!await connect()) throw new Error("Connect wallet first");
+
+      const stake = BigInt(parseInt($("#stakeVal").value || "0"));
+      if (stake < 0n || stake > 100n) throw new Error("Stake must be 0..100");
+      log("stake", stake.toString());
+
+      const enc = relayer.createEncryptedInput(getAddress(CONTRACT_ADDRESS), getAddress(userAddress));
+      enc.add8(stake); // stake as uint8
+
+      setStatus("#stakeStatus", "Encrypting stake...");
+      const { handles, inputProof } = await enc.encrypt();
+      log("encrypt result", { handles, inputProof });
+
+      const stakeRaw = handles[0]?.handle ?? handles[0]?.ciphertext ?? handles[0];
+      const stakeHandle = toHex(stakeRaw);
+      const att = typeof inputProof === "string" ? (inputProof.startsWith("0x") ? inputProof : "0x"+inputProof) : toHex(inputProof);
+
+      if (!stakeHandle) throw new Error("Invalid stake handle");
+
+      setStatus("#stakeStatus", "Submitting to chain...");
+      const tx = await contract.submitStake(stakeHandle, att);
+      log("tx sent", tx.hash);
+      setStatus("#stakeStatus", `Tx sent: ${tx.hash}`);
+      const r = await tx.wait();
+      log("tx confirmed", r);
+      setStatus("#stakeStatus", `Stake submitted (block ${r.blockNumber})`);
+
+      $("#stakeHandleOut").textContent = "Stake Input Handle (local):\n" + stakeHandle;
+      $("#stakeHandleOut").style.display = "block";
+    } catch (e) {
+      logErr("submitStake", e);
+      setStatus("#stakeStatus", `Error: ${e.message || e}`);
+    }
+  };
+
+  // 2) generate random & encrypt (0..99)
+  $("#btnGenRand").onclick = async () => {
+    try {
+      log("genRand", "start");
+      setStatus("#randStatus", "Generating random...");
+      if (!await connect()) throw new Error("Connect wallet first");
+
+      // secure random 0..99
+      const arr = new Uint32Array(1);
+      crypto.getRandomValues(arr);
+      const r = arr[0] % 100;
+      lastRandomPlain = r;
+      log("random plain", r);
+
+      const enc = relayer.createEncryptedInput(getAddress(CONTRACT_ADDRESS), getAddress(userAddress));
+      enc.add16(BigInt(r)); // store as 16-bit
+      setStatus("#randStatus", "Encrypting random...");
+      const { handles, inputProof } = await enc.encrypt();
+      log("rand encrypt", { handles, inputProof });
+
+      const randRaw = handles[0]?.handle ?? handles[0]?.ciphertext ?? handles[0];
+      const randHandle = toHex(randRaw);
+      const att = typeof inputProof === "string" ? (inputProof.startsWith("0x") ? inputProof : "0x"+inputProof) : toHex(inputProof);
+
+      if (!randHandle) throw new Error("Invalid rand handle");
+
+      lastRandomHandle = { handle: randHandle, att: att };
+      $("#randHandleOut").textContent = `Random: ${r}\nRand Handle:\n${randHandle}`;
+      $("#randHandleOut").style.display = "block";
+      setStatus("#randStatus", "Random generated and encrypted (local)");
+      log("rand handle", randHandle, "att len", att.length);
+    } catch (e) {
+      logErr("genRand", e);
+      setStatus("#randStatus", `Error: ${e.message || e}`);
+    }
+  };
+
+  // 2b) compute outcome (uses lastRandomHandle)
+  $("#btnComputeOutcome").onclick = async () => {
+    try {
+      log("computeOutcome", "start");
+      setStatus("#randStatus", "Computing outcome...");
+      if (!await connect()) throw new Error("Connect wallet first");
+
+      if (!lastRandomHandle) throw new Error("Generate and encrypt random first (click Generate Random & Encrypt)");
+
+      // player address: use user's own address
+      const player = userAddress;
+
+      // call computeOutcome(player, encRand, att)
+      const encRand = lastRandomHandle.handle;
+      const att = lastRandomHandle.att;
+
+      log("compute args", { player, encRand, attSlice: att.slice(0,20)+"..." });
+
+      const tx = await contract.computeOutcome(player, encRand, att);
+      log("tx sent", tx.hash);
+      setStatus("#randStatus", `Tx sent: ${tx.hash}`);
+      const r = await tx.wait();
+      log("tx confirmed", r);
+      setStatus("#randStatus", `Outcome computed (block ${r.blockNumber})`);
+
+      // fetch stored handle
+      const handle = await contract.outcomeHandle(player);
+      const clean = cleanHandle(handle);
+      $("#outcomeResult").style.display = "block";
+      $("#outcomeResult").innerHTML = `<div>Outcome Handle:\n<pre>${clean}</pre></div>`;
+      setStatus("#randStatus", "Outcome stored on-chain, handle available");
+      log("outcome handle", clean);
+    } catch (e) {
+      logErr("computeOutcome", e);
+      setStatus("#randStatus", `Error: ${e.message || e}`);
+    }
+  };
+
+  // 3) make outcome public
+  $("#btnMakePublic").onclick = async () => {
+    try {
+      if (!await connect()) throw new Error("Connect wallet first");
+      setStatus("#makeStatus", "Sending tx to make outcome public...");
+      const tx = await contract.makeOutcomePublic();
+      log("tx sent", tx.hash);
+      const r = await tx.wait();
+      log("tx confirmed", r);
+      setStatus("#makeStatus", "Outcome is now public (decryptable)");
+    } catch (e) {
+      logErr("makePublic", e);
+      setStatus("#makeStatus", `Error: ${e.message || e}`);
+    }
+  };
+
+  // 4) get handle
+  $("#btnGetHandle").onclick = async () => {
+    try {
+      if (!await connect()) throw new Error("Connect wallet first");
+      setStatus("#decryptStatus", "Fetching handle...");
+      const addr = $("#fetchAddr").value.trim() || userAddress;
+      const tgt = getAddress(addr);
+      const has = await contract.hasOutcome(tgt);
+      log("hasOutcome", has);
+      if (!has) { setStatus("#decryptStatus", "No outcome exists for this address"); return; }
+      const handle = await contract.outcomeHandle(tgt);
+      const clean = cleanHandle(handle);
+      $("#outcomeResult").style.display = "block";
+      $("#outcomeResult").innerHTML = `<div>Outcome Handle:\n<pre>${clean}</pre></div>`;
+      setStatus("#decryptStatus", "Handle retrieved (see UI and console)");
+      log("outcomeHandle", clean);
+    } catch (e) {
+      logErr("getHandle", e);
+      setStatus("#decryptStatus", `Error: ${e.message || e}`);
+    }
+  };
+
+  // publicDecrypt helper (SDK 0.3.x)
+  async function publicDecryptHandle(handle) {
+    if (!relayer) throw new Error("Relayer not initialized");
+    const cleaned = cleanHandle(handle);
+    if (!cleaned.startsWith("0x") || cleaned.length !== 66) throw new Error("Invalid handle (bytes32)");
+    const req = [ cleaned ];
+    log("publicDecrypt req", req);
+    const out = await relayer.publicDecrypt(req);
+    log("publicDecrypt raw out", out);
+    if (!out || typeof out !== "object") throw new Error("Invalid decrypt response");
+    if (!out.clearValues) throw new Error("Missing clearValues");
+    const lower = cleaned.toLowerCase();
+    const val = out.clearValues[cleaned] ?? out.clearValues[lower];
+    if (val === undefined || val === null) throw new Error("No clear value for this handle");
+    return Number(val); // 0..2
+  }
+
+  // decrypt
+  $("#btnDecrypt").onclick = async () => {
+    try {
+      if (!await connect()) throw new Error("Connect wallet first");
+      setStatus("#decryptStatus", "Starting decrypt...");
+      let raw = $("#outcomeResult").textContent || "";
+      if (!raw || raw.trim() === "") {
+        const addr = $("#fetchAddr").value.trim() || userAddress;
+        raw = await contract.outcomeHandle(getAddress(addr));
+      }
+      const handle = cleanHandle(raw);
+      log("decrypt handle", handle);
+      setStatus("#decryptStatus", "Calling relayer.publicDecrypt([...])...");
+      const code = await publicDecryptHandle(handle);
+      let label = "UNKNOWN";
+      if (code === 0) label = "LOSE";
+      else if (code === 1) label = "SMALL WIN";
+      else if (code === 2) label = "BIG WIN";
+      const outDiv = $("#outcomeResult");
+      outDiv.style.display = "block";
+      outDiv.innerHTML = `<div style="font-weight:700; font-size:16px;">${label} (code: ${code})</div>
+                          <div style="margin-top:6px; color:#9fb1d9;">Handle: ${handle}</div>
+                          <div style="margin-top:8px; color:#9fb1d9;">(Local random used for compute: ${lastRandomPlain ?? 'N/A'})</div>`;
+      setStatus("#decryptStatus", `Decrypted: ${label}`);
+      log("decrypt result", { code, label, lastRandomPlain });
+    } catch (e) {
+      logErr("decrypt", e);
+      setStatus("#decryptStatus", `Error: ${e.message || e}`);
+    }
+  };
+
+  console.log("Probability Twist Wheel UI loaded. Remember to set CONTRACT_ADDRESS in script and use Relayer SDK 0.3.x. Local whitepaper: /mnt/data/fhevm_whitepaper_new.pdf");
+</script>
+</body>
+</html>

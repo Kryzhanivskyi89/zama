@@ -1,0 +1,586 @@
+<!-- <!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Private DAO KPI Reporting — FHEVM (with logs)</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #f0f4f8;
+        color: #222;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+    .btn-primary:hover { background: #1e4fcf; }
+
+    .card {
+        background: white;
+        padding: 18px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    #log {
+        height: 160px;
+        overflow-y: auto;
+        background: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        font-family: monospace;
+        font-size: 13px;
+    }
+
+    .small { font-size: 13px; color: #666; margin-top: 6px; }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1 style="font-size: 26px;">📊 Private DAO KPI Reporter</h1>
+    <button id="connectBtn" class="btn btn-primary">Connect Wallet</button>
+</header>
+
+<div class="card">
+    <h2 style="margin-bottom: 10px;">Submit Private KPI</h2>
+
+    <input id="daoName" placeholder="DAO Name (string)"/>
+    <input id="daoDesc" placeholder="Description (optional)"/>
+
+    <input id="daoId" placeholder="DAO ID (string)"/>
+    <input id="kpi" type="number" min="0" max="65535" placeholder="Encrypted KPI value"/>
+
+    <button id="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Encrypt & Submit</button>
+
+    <p id="status1" class="small"></p>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 10px;">Reveal DAO KPI</h2>
+
+    <input id="daoReveal" placeholder="DAO ID (string)"/>
+
+    <button id="makePublic" class="btn" style="background: #fbbf24; width: 100%;">Make Public</button>
+    <button id="getHandle" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Get Handle</button>
+    <button id="decrypt" class="btn" style="background: #16a34a; width: 100%; margin-top: 8px; color: white;">Public Decrypt</button>
+
+    <p style="margin-top: 10px;"><strong>Handle:</strong></p>
+    <p id="hbox" style="word-break: break-all;"></p>
+
+    <p style="margin-top: 10px;"><strong>Decrypted KPI:</strong></p>
+    <p id="result" style="font-size: 22px;"></p>
+
+    <p id="status2" class="small"></p>
+</div>
+
+<div class="card">
+    <h3>Logs</h3>
+    <div id="log"></div>
+</div>
+
+
+<script type="module">
+import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+import { BrowserProvider, Contract, getAddress, keccak256, toUtf8Bytes } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+// CONFIG
+const RELAYER_URL = "https://relayer.testnet.zama.org";
+const GATEWAY_URL  = "https://gateway.testnet.zama.org";
+const CONTRACT = "0x0E35cBC96bF93fbE2399E26369a5920c7b2199e0";
+
+const ABI = [
+  { "inputs":[{"type":"bytes32","name":"daoId"}],"name":"initDAO","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"daoId"},{"type":"bytes32","name":"extKPI"},{"type":"bytes","name":"att"}],"name":"submitKPI","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"daoId"}],"name":"makePublic","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"daoId"}],"name":"kpiHandle","outputs":[{"type":"bytes32"}],"stateMutability":"view","type":"function" }
+];
+
+const $ = (s)=>document.querySelector(s);
+const uiLog = (m)=>{ $("#log").innerText += m + "\n"; $("#log").scrollTop = $("#log").scrollHeight; };
+const toHex = u8 => '0x' + Array.from(u8, b => b.toString(16).padStart(2,'0')).join('');
+
+let provider, signer, relayer, contract, addr;
+
+/* =============== CONNECT WALLET =============== */
+$("#connectBtn").onclick = async () => {
+    try {
+        console.log("[connect] requesting accounts...");
+        uiLog("[connect] requesting accounts...");
+        provider = new BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = await provider.getSigner();
+        addr = await signer.getAddress();
+        console.log("[connect] wallet connected:", addr);
+        uiLog("[connect] wallet connected: " + addr);
+
+        $("#connectBtn").innerText = addr.slice(0,6)+"..."+addr.slice(-4);
+
+        contract = new Contract(getAddress(CONTRACT), ABI, signer);
+        console.log("[connect] contract attached:", CONTRACT);
+        uiLog("[connect] contract attached: " + CONTRACT);
+
+        console.log("[connect] initSDK() and relayer createInstance()...");
+        uiLog("[connect] initSDK() and relayer createInstance()...");
+        await initSDK();
+        relayer = await createInstance({
+            ...SepoliaConfig,
+            relayerUrl: RELAYER_URL,
+            gatewayUrl: GATEWAY_URL,
+            network: window.ethereum,
+            debug: true
+        });
+        console.log("[connect] relayer ready");
+        uiLog("[connect] relayer ready");
+    } catch (e) {
+        console.error("[connect] error:", e);
+        uiLog("[connect] ERROR: " + (e.message || e));
+    }
+};
+
+/* =============== SUBMIT KPI =============== */
+$("#submit").onclick = async () => {
+    try {
+        console.log("[submit] start");
+        uiLog("[submit] start");
+        $("#status1").textContent = "Encrypting…";
+
+        const daoIdStr = $("#daoId").value;
+        const daoId = keccak256(toUtf8Bytes(daoIdStr));
+        const kpiVal = parseInt($("#kpi").value);
+
+        console.log("[submit] daoIdStr:", daoIdStr);
+        console.log("[submit] daoId hash:", daoId);
+        console.log("[submit] kpi value:", kpiVal);
+        uiLog("[submit] daoId: " + daoIdStr + " -> " + daoId);
+        uiLog("[submit] kpi: " + kpiVal);
+
+        if (isNaN(kpiVal)) throw new Error("KPI must be a number");
+        if (!relayer) throw new Error("Relayer not initialized");
+
+        console.log("[submit] creating encrypted input...");
+        uiLog("[submit] creating encrypted input...");
+        const enc = relayer.createEncryptedInput(getAddress(CONTRACT), getAddress(addr));
+        enc.add16(BigInt(kpiVal));
+        console.log("[submit] added16:", kpiVal);
+        uiLog("[submit] added16: " + kpiVal);
+
+        const { handles, inputProof } = await enc.encrypt();
+        console.log("[submit] encryption done");
+        console.log("[submit] handles:", handles);
+        console.log("[submit] inputProof type:", typeof inputProof);
+
+        // Extract handle (може бути {handle: ..., ciphertext: ...} або просто bytes32)
+        const handle = handles[0]?.handle || handles[0]?.ciphertext || handles[0];
+        console.log("[submit] final handle:", handle);
+        uiLog("[submit] handle: " + handle);
+
+        // Convert proof to hex if needed
+        const att = typeof inputProof === "string" 
+            ? (inputProof.startsWith("0x") ? inputProof : "0x" + inputProof) 
+            : toHex(inputProof);
+        console.log("[submit] attestation:", att);
+        uiLog("[submit] attestation len: " + att.length);
+
+        $("#status1").textContent = "Sending transaction...";
+        console.log("[submit] sending tx to submitKPI");
+        uiLog("[submit] sending tx to submitKPI");
+
+        const tx = await contract.submitKPI(daoId, handle, att);
+        console.log("[submit] tx sent:", tx.hash);
+        uiLog("[submit] tx sent: " + tx.hash);
+
+        const rec = await tx.wait();
+        console.log("[submit] tx confirmed in block", rec.blockNumber);
+        uiLog("[submit] tx confirmed in block " + rec.blockNumber);
+
+        $("#status1").textContent = "Submitted ✔";
+        console.log("[submit] done");
+        uiLog("[submit] done");
+    } catch (e) {
+        console.error("[submit] error:", e);
+        uiLog("[submit] ERROR: " + (e?.reason || e?.message || String(e)));
+        $("#status1").textContent = "Error: " + (e?.reason || e?.message || String(e));
+    }
+};
+
+/* =============== MAKE PUBLIC =============== */
+$("#makePublic").onclick = async () => {
+    try {
+        console.log("[makePublic] start");
+        uiLog("[makePublic] start");
+
+        const daoIdStr = $("#daoReveal").value;
+        const daoId = keccak256(toUtf8Bytes(daoIdStr));
+        console.log("[makePublic] daoId:", daoIdStr, daoId);
+        uiLog("[makePublic] daoId: " + daoIdStr + " -> " + daoId);
+
+        if (!contract) throw new Error("Contract not initialized");
+
+        $("#status2").textContent = "Submitting makePublic tx...";
+        const tx = await contract.makePublic(daoId);
+        console.log("[makePublic] tx sent:", tx.hash);
+        uiLog("[makePublic] tx sent: " + tx.hash);
+
+        const rec = await tx.wait();
+        console.log("[makePublic] tx confirmed in block", rec.blockNumber);
+        uiLog("[makePublic] tx confirmed in block " + rec.blockNumber);
+
+        $("#status2").textContent = "Made public ✔";
+    } catch (e) {
+        console.error("[makePublic] error:", e);
+        uiLog("[makePublic] ERROR: " + (e?.reason || e?.message || String(e)));
+        $("#status2").textContent = "Error: " + (e?.reason || e?.message || String(e));
+    }
+};
+
+/* =============== GET HANDLE =============== */
+$("#getHandle").onclick = async () => {
+    try {
+        console.log("[getHandle] start");
+        uiLog("[getHandle] start");
+
+        const daoIdStr = $("#daoReveal").value;
+        const daoId = keccak256(toUtf8Bytes(daoIdStr));
+        console.log("[getHandle] daoId:", daoIdStr, daoId);
+        uiLog("[getHandle] daoId: " + daoIdStr + " -> " + daoId);
+
+        if (!contract) throw new Error("Contract not initialized");
+
+        const h = await contract.kpiHandle(daoId);
+        console.log("[getHandle] raw handle:", h);
+        uiLog("[getHandle] handle: " + h);
+
+        $("#hbox").textContent = h;
+        $("#status2").textContent = "Handle loaded ✔";
+    } catch (e) {
+        console.error("[getHandle] error:", e);
+        uiLog("[getHandle] ERROR: " + (e?.reason || e?.message || String(e)));
+        $("#status2").textContent = "Error: " + (e?.reason || e?.message || String(e));
+    }
+};
+
+/* =============== PUBLIC DECRYPT =============== */
+$("#decrypt").onclick = async () => {
+    try {
+        console.log("[decrypt] start");
+        uiLog("[decrypt] start");
+
+        const handleText = $("#hbox").textContent.trim();
+        console.log("[decrypt] handle from box:", handleText);
+        uiLog("[decrypt] handle: " + handleText);
+
+        if (!handleText || handleText === "") {
+            throw new Error("Get handle first by clicking 'Get Handle'");
+        }
+
+        if (!relayer) throw new Error("Relayer not initialized");
+
+        $("#status2").textContent = "Decrypting…";
+        console.log("[decrypt] calling publicDecrypt with handle:", handleText);
+        uiLog("[decrypt] calling publicDecrypt...");
+
+        const result = await relayer.publicDecrypt([handleText]);
+        console.log("[decrypt] raw result:", result);
+        uiLog("[decrypt] raw result received");
+
+        // Get first key from clearValues
+        const key = Object.keys(result.clearValues)[0];
+        console.log("[decrypt] key:", key);
+        console.log("[decrypt] all keys:", Object.keys(result.clearValues));
+
+        const raw = Number(result.clearValues[key]);
+        console.log("[decrypt] decrypted value:", raw);
+        uiLog("[decrypt] decrypted value: " + raw);
+
+        $("#result").textContent = raw;
+        $("#status2").textContent = "Decrypted ✔";
+    } catch (e) {
+        console.error("[decrypt] error:", e);
+        uiLog("[decrypt] ERROR: " + (e?.reason || e?.message || String(e)));
+        $("#status2").textContent = "Error: " + (e?.reason || e?.message || String(e));
+    }
+};
+
+</script>
+
+
+
+</body>
+</html> -->
+
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Private DAO KPI Reporting — FHEVM (with logs)</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #f0f4f8;
+        color: #222;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+    .btn-primary:hover { background: #1e4fcf; }
+
+    .card {
+        background: white;
+        padding: 18px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    #log {
+        height: 160px;
+        overflow-y: auto;
+        background: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        font-family: monospace;
+        font-size: 13px;
+    }
+
+    .small { font-size: 13px; color: #666; margin-top: 6px; }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1 style="font-size: 26px;">📊 Private DAO KPI Reporter</h1>
+    <button id="connectBtn" class="btn btn-primary">Connect Wallet</button>
+</header>
+
+<div class="card">
+    <h2 style="margin-bottom: 10px;">Submit Private KPI</h2>
+
+    <input id="daoName" placeholder="DAO Name (string)"/>
+    <input id="daoDesc" placeholder="Description (optional)"/>
+
+    <input id="daoId" placeholder="DAO ID (string)"/>
+    <input id="kpi" type="number" min="0" max="65535" placeholder="Encrypted KPI value"/>
+
+    <button id="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Encrypt & Submit</button>
+
+    <p id="status1" class="small"></p>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 10px;">Reveal DAO KPI</h2>
+
+    <input id="daoReveal" placeholder="DAO ID (string)"/>
+
+    <button id="makePublic" class="btn" style="background: #fbbf24; width: 100%;">Make Public</button>
+    <button id="getHandle" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Get Handle</button>
+    <button id="decrypt" class="btn" style="background: #16a34a; width: 100%; margin-top: 8px; color: white;">Public Decrypt</button>
+
+    <p style="margin-top: 10px;"><strong>Handle:</strong></p>
+    <p id="hbox" style="word-break: break-all;"></p>
+
+    <p style="margin-top: 10px;"><strong>Decrypted KPI:</strong></p>
+    <p id="result" style="font-size: 22px;"></p>
+
+    <p id="status2" class="small"></p>
+</div>
+
+<div class="card">
+    <h3>Logs</h3>
+    <div id="log"></div>
+</div>
+
+<script type="module">
+import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+import { BrowserProvider, Contract, getAddress, keccak256, toUtf8Bytes } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+const CONFIG = {
+  RELAYER_URL: "https://relayer.testnet.zama.org",
+  GATEWAY_URL: "https://gateway.testnet.zama.org",
+  CONTRACT_ADDRESS: "0x0E35cBC96bF93fbE2399E26369a5920c7b2199e0"
+};
+
+const ABI = [
+  { "inputs":[{"type":"bytes32","name":"daoId"}],"name":"initDAO","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"daoId"},{"type":"bytes32","name":"extKPI"},{"type":"bytes","name":"att"}],"name":"submitKPI","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"daoId"}],"name":"makePublic","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"daoId"}],"name":"kpiHandle","outputs":[{"type":"bytes32"}],"stateMutability":"view","type":"function" }
+];
+
+const $ = (s)=>document.querySelector(s);
+const log = (msg)=>{ $("#log").innerText += msg + "\n"; };
+
+let provider, signer, relayer, contract;
+let addr;
+
+$("#connectBtn").onclick = async () => {
+  provider = new BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = await provider.getSigner();
+  addr = await signer.getAddress();
+  console.log('[WALLET] Connected:', addr);
+
+  $("#connectBtn").innerText = addr.slice(0,6) + "..." + addr.slice(-4);
+
+  log("Wallet connected: " + addr);
+
+  contract = new Contract(getAddress(CONFIG.CONTRACT_ADDRESS), ABI, signer);
+
+  await initSDK();
+  relayer = await createInstance({
+    ...SepoliaConfig,
+    relayerUrl: CONFIG.RELAYER_URL,
+    gatewayUrl: CONFIG.GATEWAY_URL,
+    network: window.ethereum,
+    debug: true
+  });
+  console.log('[RELAYER] Instance created:', relayer);
+};
+
+$("#submit").onclick = async () => {
+  try{
+    $("#status1").textContent = "Encrypting…";
+
+    const daoId = keccak256(toUtf8Bytes($("#daoId").value));
+    const kpiValue = parseInt($("#kpi").value);
+    console.log('[SUBMIT] Project name:', $("#daoName").value, 'Project ID:', $("#daoId").value, 'Keccak:', daoId, 'Score:', kpiValue);
+
+    const enc = relayer.createEncryptedInput(getAddress(CONFIG.CONTRACT_ADDRESS), addr);
+    enc.add16(BigInt(kpiValue));
+
+    const { handles, inputProof } = await enc.encrypt();
+    console.log('[SUBMIT] handle:', handles[0], 'attestation:', inputProof);
+
+    const tx = await contract.submitKPI(daoId, handles[0], inputProof);
+    console.log('[SUBMIT] Tx sent:', tx.hash);
+    await tx.wait();
+
+    $("#status1").textContent = "Score submitted ✔";
+    log("Score submitted");
+  }catch(e){
+    $("#status1").textContent = "Error: " + (e.message || e.reason);
+    log("ERROR: " + e.message);
+    console.error('[SUBMIT] ERROR:', e);
+  }
+};
+
+$("#makePublic").onclick = async () => {
+  try{
+    const daoId = keccak256(toUtf8Bytes($("#daoReveal").value));
+    console.log('[REVEAL] Revealing for Project:', $("#daoReveal").value, 'Keccak:', daoId);
+    const tx = await contract.makePublic(daoId);
+    console.log('[REVEAL] Tx sent:', tx.hash);
+    await tx.wait();
+
+    $("#status2").textContent = "Made public ✔";
+    log("Score made public");
+  }catch(e){
+    $("#status2").textContent = "Error: " + (e.message || e.reason);
+    log("ERROR: " + e.message);
+    console.error('[REVEAL] ERROR:', e);
+  }
+};
+
+$("#getHandle").onclick = async () => {
+  const daoId = keccak256(toUtf8Bytes($("#daoReveal").value));
+  const handle = await contract.kpiHandle(daoId);
+  $("#hbox").textContent = handle;
+  $("#status2").textContent = "Handle loaded ✔";
+  log("Handle: " + handle);
+  console.log('[GET HANDLE] Project:', $("#daoReveal").value, 'Keccak:', daoId, 'Handle:', handle);
+};
+
+$("#decrypt").onclick = async () => {
+  try{
+    $("#status2").textContent = "Decrypting…";
+
+    const h = $("#hbox").textContent.trim();
+    if (!h) throw new Error("No handle");
+
+    console.log('[DECRYPT] Handle:', h);
+
+    const r = await relayer.publicDecrypt([h]);
+    console.log("[DECRYPT] full response:", r);
+
+    const key = Object.keys(r.clearValues)[0];
+    const raw = Number(r.clearValues[key]);
+
+    $("#result").textContent = raw;
+    $("#status2").textContent = "Decrypted ✔";
+
+    log("Decrypted result: " + raw);
+  }catch(e){
+    $("#status2").textContent = "Error: " + (e.message || e.reason);
+    log("ERROR: " + e.message);
+    console.error('[DECRYPT] ERROR:', e);
+  }
+};
+
+</script>
+
+</body>
+</html>
