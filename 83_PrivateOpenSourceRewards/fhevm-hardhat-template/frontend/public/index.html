@@ -1,0 +1,259 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Open Source Rewards — FHEVM</title>
+
+
+<style>
+  body {
+    background: radial-gradient(circle at top, #dbeafe 0%, #93c5fd 40%, #2563eb 100%);
+    font-family: 'Inter', sans-serif;
+    color: #0f172a;
+    min-height: 100vh;
+  }
+
+  .glass-card {
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  }
+
+  .btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s;
+    border: none;
+  }
+
+  .btn-primary { background: #2563eb; color: white; }
+  .btn-primary:hover { background: #1d4ed8; }
+
+  .btn-green { background: #16a34a; color: white; }
+  .btn-green:hover { background: #15803d; }
+
+  .btn-yellow { background: #fbbf24; color: #78350f; }
+  .btn-yellow:hover { background: #f59e0b; }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+  }
+
+  #log {
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 13px;
+    height: 180px;
+    overflow-y: auto;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  }
+</style>
+</head>
+
+<body class="p-6">
+
+<header class="flex justify-between items-center mb-6">
+  <h1 class="text-3xl font-extrabold">🌟 Private Open-Source Rewards</h1>
+
+  <button id="connectBtn" class="btn btn-primary text-lg">
+    Connect Wallet
+  </button>
+</header>
+
+<div class="grid md:grid-cols-2 gap-6">
+
+  <!-- LEFT SIDE -->
+  <div class="glass-card">
+    <h2 class="text-xl font-semibold mb-3">Submit Contribution Score</h2>
+
+    <input id="projName" placeholder="Project Name (string)"/>
+
+    <input id="projId" placeholder="Project ID (string)"/>
+    <input id="score" type="number" min="0" max="65535" placeholder="Encrypted Score"/>
+
+    <button id="send" class="btn btn-primary w-full mt-2">Encrypt & Submit</button>
+    <p id="status1" class="mt-2 text-sm"></p>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="glass-card">
+    <h2 class="text-xl font-semibold mb-3">Reveal Result</h2>
+
+    <input id="projReveal" placeholder="Project ID (string)"/>
+
+    <button id="reveal" class="btn btn-yellow w-full mt-2">Make Public</button>
+    <button id="getHandle" class="btn btn-primary w-full mt-2">Get Score Handle</button>
+    <button id="pubDec" class="btn btn-green w-full mt-2">Public Decrypt</button>
+
+    <p class="mt-3 font-semibold">Handle:</p>
+    <p id="hbox" class="text-sm break-all"></p>
+
+    <p class="mt-3 font-semibold">Decrypted score:</p>
+    <p id="result" class="text-2xl font-bold"></p>
+
+    <p id="status2" class="mt-2 text-sm"></p>
+  </div>
+
+</div>
+
+<div class="glass-card mt-6">
+  <h2 class="text-lg font-semibold mb-2">📜 Logs</h2>
+  <div id="log"></div>
+</div>
+
+<script type="module">
+// import { BrowserProvider, Contract, getAddress, keccak256, toUtf8Bytes } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";
+// import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.ai/relayer-sdk-js/0.2.0/relayer-sdk-js.js";
+
+import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+import { BrowserProvider, Contract, getAddress, keccak256, toUtf8Bytes } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+    const CONFIG = {
+      RELAYER_URL: "https://relayer.testnet.zama.org",
+      GATEWAY_URL: "https://gateway.testnet.zama.org",
+      CONTRACT_ADDRESS: "0x6A4Bb15F54B76FA2ebCf506f3Bd86bb9b6F7978d"
+    };
+
+const ABI = [
+  { "inputs":[{"type":"bytes32","name":"projectId"}],"name":"initProject","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"projectId"},{"type":"bytes32","name":"extScore"},{"type":"bytes","name":"att"}],"name":"submitScore","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"projectId"}],"name":"makePublic","outputs":[],"stateMutability":"nonpayable","type":"function" },
+  { "inputs":[{"type":"bytes32","name":"projectId"}],"name":"scoreHandle","outputs":[{"type":"bytes32"}],"stateMutability":"view","type":"function" }
+];
+
+const $ = (s)=>document.querySelector(s);
+const log = (msg)=>{ $("#log").innerText += msg + "\n"; };
+
+let provider, signer, relayer, contract;
+let addr;
+
+// Connect Wallet
+$("#connectBtn").onclick = async () => {
+  provider = new BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = await provider.getSigner();
+  addr = await signer.getAddress();
+  console.log('[WALLET] Connected:', addr);
+
+  $("#connectBtn").innerText = addr.slice(0,6) + "..." + addr.slice(-4);
+
+  log("Wallet connected: " + addr);
+
+  contract = new Contract(getAddress(CONFIG.CONTRACT_ADDRESS), ABI, signer);
+
+  await initSDK();
+  relayer = await createInstance({
+    ...SepoliaConfig,
+    relayerUrl: CONFIG.RELAYER_URL,
+    gatewayUrl: CONFIG.GATEWAY_URL,
+    network: window.ethereum,
+    debug: true
+  });
+  console.log('[RELAYER] Instance created:', relayer);
+};
+
+
+// Submit encrypted score
+$("#send").onclick = async () => {
+  try{
+    $("#status1").textContent = "Encrypting…";
+
+    const projectId = keccak256(toUtf8Bytes($("#projId").value));
+    const score = parseInt($("#score").value);
+    console.log('[SUBMIT] Project name:', $("#projName").value, 'Project ID:', $("#projId").value, 'Keccak:', projectId, 'Score:', score);
+
+    const enc = relayer.createEncryptedInput(getAddress(CONFIG.CONTRACT_ADDRESS), addr);
+    enc.add16(BigInt(score));
+
+    const { handles, inputProof } = await enc.encrypt();
+    console.log('[SUBMIT] handle:', handles[0], 'attestation:', inputProof);
+
+    const tx = await contract.submitScore(projectId, handles[0], inputProof);
+    console.log('[SUBMIT] Tx sent:', tx.hash);
+    await tx.wait();
+
+    $("#status1").textContent = "Score submitted ✔";
+    log("Score submitted");
+  }catch(e){
+    $("#status1").textContent = "Error: " + (e.message || e.reason);
+    log("ERROR: " + e.message);
+    console.error('[SUBMIT] ERROR:', e);
+  }
+};
+
+
+// Make public
+$("#reveal").onclick = async () => {
+  try{
+    const projectId = keccak256(toUtf8Bytes($("#projReveal").value));
+    console.log('[REVEAL] Revealing for Project:', $("#projReveal").value, 'Keccak:', projectId);
+    const tx = await contract.makePublic(projectId);
+    console.log('[REVEAL] Tx sent:', tx.hash);
+    await tx.wait();
+
+    $("#status2").textContent = "Made public ✔";
+    log("Score made public");
+  }catch(e){
+    $("#status2").textContent = "Error: " + (e.message || e.reason);
+    log("ERROR: " + e.message);
+    console.error('[REVEAL] ERROR:', e);
+  }
+};
+
+
+// Get handle
+$("#getHandle").onclick = async () => {
+  const projectId = keccak256(toUtf8Bytes($("#projReveal").value));
+  const handle = await contract.scoreHandle(projectId);
+  $("#hbox").textContent = handle;
+  $("#status2").textContent = "Handle loaded ✔";
+  log("Handle: " + handle);
+  console.log('[GET HANDLE] Project:', $("#projReveal").value, 'Keccak:', projectId, 'Handle:', handle);
+};
+
+
+$("#pubDec").onclick = async () => {
+  try{
+    $("#status2").textContent = "Decrypting…";
+
+    const h = $("#hbox").textContent.trim();
+    if (!h) throw new Error("No handle");
+
+    console.log('[DECRYPT] Handle:', h);
+
+    const r = await relayer.publicDecrypt([h]);
+    console.log("[DECRYPT] full response:", r);
+
+    // Extract canonical key
+    const key = Object.keys(r.clearValues)[0];
+    const raw = Number(r.clearValues[key]);
+
+    $("#result").textContent = raw;
+    $("#status2").textContent = "Decrypted ✔";
+
+    log("Decrypted result: " + raw);
+  }catch(e){
+    $("#status2").textContent = "Error: " + (e.message || e.reason);
+    log("ERROR: " + e.message);
+    console.error('[DECRYPT] ERROR:', e);
+  }
+};
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hidden Door Code — Zama FHEVM</title>
+  <style>
+    :root {
+      --bg-main: #020617;
+      --bg-glow-1: radial-gradient(circle at 0% 0%, rgba(56,189,248,0.22), transparent 60%);
+      --bg-glow-2: radial-gradient(circle at 100% 100%, rgba(34,197,94,0.2), transparent 65%);
+      --panel: #020617;
+      --panel-inner: #020617;
+      --border-outer: #020617;
+      --border-inner: #1e293b;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.2);
+      --accent-warm: #f97316;
+      --success: #22c55e;
+      --warning: #eab308;
+      --error: #ef4444;
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-strong: 0 22px 60px rgba(15,23,42,0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 14px 34px;
+      background:
+        var(--bg-glow-1),
+        var(--bg-glow-2),
+        radial-gradient(circle at 50% 0%, #020617 0, #020617 40%, #020617 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 980px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background:
+        radial-gradient(circle at 0 0, rgba(15,23,42,0.9), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(30,64,175,0.5), transparent 65%),
+        linear-gradient(135deg, #020617, #020617);
+      border-radius: 30px;
+      border: 1px solid rgba(30,64,175,0.7);
+      box-shadow:
+        var(--shadow-strong),
+        0 0 0 1px #000;
+      padding: 18px 18px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(30,64,175,0.8);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #f9fafb;
+    }
+
+    h1::before {
+      content: "🚪";
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 30% 20%, #f9fafb, transparent 60%),
+        linear-gradient(145deg, #22c55e, #eab308);
+      box-shadow:
+        0 0 0 1px #020617,
+        0 14px 30px rgba(15,23,42,0.95);
+    }
+
+    header small {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(148,163,184,0.9);
+      margin-top: 4px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 360px;
+    }
+
+    h2 {
+      font-size: 1rem;
+      margin: 0 0 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #e2e8f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      background-image: linear-gradient(135deg, #38bdf8, #22c55e);
+      color: #020617;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background-position 0.15s;
+      background-size: 160% 160%;
+      background-position: 0% 50%;
+      box-shadow:
+        0 12px 26px rgba(8,47,73,0.9),
+        0 0 0 1px #020617;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background-position: 100% 50%;
+      box-shadow:
+        0 18px 34px rgba(8,47,73,0.95),
+        0 0 0 1px #020617;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow:
+        0 10px 22px rgba(8,47,73,0.85),
+        0 0 0 1px #020617;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background-image: linear-gradient(135deg, #020617, #020617);
+      color: var(--muted);
+      box-shadow:
+        0 0 0 1px rgba(30,64,175,0.7),
+        inset 0 0 0 1px #020617;
+    }
+
+    .btn-secondary {
+      background-image: none;
+      background:
+        radial-gradient(circle at 0 0, rgba(56,189,248,0.22), transparent 60%),
+        linear-gradient(135deg, #020617, #020617);
+      color: #e5e7eb;
+      box-shadow:
+        0 14px 26px rgba(15,23,42,0.95),
+        0 0 0 1px #020617;
+      border: 1px solid rgba(30,64,175,0.85);
+    }
+
+    .btn-success {
+      background-image: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #022c22;
+      box-shadow:
+        0 14px 28px rgba(22,163,74,0.9),
+        0 0 0 1px rgba(6,95,70,1);
+    }
+
+    .card {
+      background:
+        radial-gradient(circle at 0 0, rgba(56,189,248,0.16), transparent 60%),
+        radial-gradient(circle at 100% 0, rgba(249,115,22,0.16), transparent 60%),
+        linear-gradient(135deg, #020617, #020617);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(30,64,175,0.85);
+      box-shadow:
+        0 18px 40px rgba(15,23,42,0.9),
+        0 0 0 1px #020617;
+      padding: 16px 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(120deg,
+          rgba(15,23,42,0.1),
+          rgba(56,189,248,0.18),
+          rgba(15,23,42,0.1),
+          rgba(249,115,22,0.16),
+          rgba(15,23,42,0.1));
+      opacity: 0.55;
+      mix-blend-mode: soft-light;
+    }
+
+    .card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* “Екран дверей” для чисел */
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(148,163,184,0.95);
+    }
+
+    label + input {
+      margin-top: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(30,64,175,0.9);
+      background:
+        radial-gradient(circle at 0 0, rgba(15,23,42,0.96), rgba(15,23,42,1)),
+        linear-gradient(135deg, #020617, #020617);
+      color: #e5e7eb;
+      font-size: 18px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing: 0.24em;
+      text-align: center;
+      outline: none;
+      box-shadow:
+        0 0 0 1px #020617,
+        inset 0 0 0 1px #020617;
+      caret-color: var(--accent);
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow:
+        0 0 0 1px var(--accent),
+        0 0 0 6px rgba(56,189,248,0.24),
+        inset 0 0 0 1px #020617;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      align-items: center;
+    }
+
+    pre {
+      background:
+        radial-gradient(circle at 0 0, rgba(15,23,42,0.96), rgba(15,23,42,1));
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      border: 1px solid rgba(30,64,175,0.85);
+      overflow: auto;
+      font-size: 11px;
+      max-height: 240px;
+      color: rgba(226,232,240,0.92);
+      box-shadow:
+        0 0 0 1px #020617,
+        inset 0 0 0 1px #020617;
+      line-height: 1.5;
+    }
+
+    .status {
+      font-size: 11px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      margin-top: 6px;
+      border: 1px solid rgba(30,64,175,0.85);
+      background:
+        radial-gradient(circle at 0 0, rgba(15,23,42,0.96), rgba(15,23,42,1));
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #e5e7eb;
+      box-shadow:
+        0 10px 20px rgba(15,23,42,0.9),
+        0 0 0 1px #020617;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #64748b;
+      box-shadow: 0 0 0 3px rgba(100,116,139,0.3);
+    }
+
+    .status.pending {
+      color: #facc15;
+      border-color: rgba(234,179,8,0.8);
+      background:
+        radial-gradient(circle at 0 0, rgba(234,179,8,0.16), transparent 60%),
+        linear-gradient(135deg, #111827, #020617);
+    }
+
+    .status.pending::before {
+      background: #facc15;
+      box-shadow: 0 0 0 3px rgba(250,204,21,0.26);
+    }
+
+    .status.success {
+      color: #bbf7d0;
+      border-color: rgba(34,197,94,0.8);
+      background:
+        radial-gradient(circle at 0 0, rgba(34,197,94,0.18), transparent 60%),
+        linear-gradient(135deg, #052e16, #020617);
+    }
+
+    .status.success::before {
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.28);
+    }
+
+    .status.error {
+      color: #fecaca;
+      border-color: rgba(248,113,113,0.8);
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,0.2), transparent 60%),
+        linear-gradient(135deg, #450a0a, #020617);
+    }
+
+    .status.error::before {
+      background: #ef4444;
+      box-shadow: 0 0 0 3px rgba(248,113,113,0.3);
+    }
+
+    .match-result {
+      padding: 14px 14px 12px;
+      border-radius: var(--radius-md);
+      margin-top: 14px;
+      border-left: 3px solid var(--success);
+      background:
+        radial-gradient(circle at 0 0, rgba(34,197,94,0.32), transparent 65%),
+        linear-gradient(135deg, #052e16, #065f46);
+      color: #ecfdf5;
+      box-shadow:
+        0 14px 30px rgba(6,95,70,0.9),
+        0 0 0 1px #022c22;
+    }
+
+    .match-result.no-match {
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,0.32), transparent 65%),
+        linear-gradient(135deg, #7f1d1d, #b91c1c);
+      border-left-color: #ef4444;
+      box-shadow:
+        0 14px 30px rgba(127,29,29,0.9),
+        0 0 0 1px #450a0a;
+    }
+
+    footer {
+      text-align: right;
+      color: rgba(148,163,184,0.9);
+      font-size: 11px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(30,64,175,0.85);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    footer::before {
+      content: "ENCRYPTED DOOR · GUESS THE CODE";
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(148,163,184,0.85);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 16px 10px 22px;
+      }
+
+      .container {
+        padding: 14px 12px 18px;
+        border-radius: 24px;
+      }
+
+      header {
+        align-items: flex-start;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+        flex-wrap: wrap;
+      }
+
+      .row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn,
+      .status {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🚪 Hidden Door Code</h1>
+        <small>Encrypted keypad · one secret lock</small>
+        <p>Set a private door code on-chain and let players try to crack it using only “correct / higher / lower” hints.</p>
+      </div>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- ADMIN: SET CODE -->
+    <section class="card">
+      <h2>1️⃣ Set Encrypted Door Code</h2>
+      <p>
+        Encrypt a secret door code (1–9999). Players will only learn “correct / higher / lower”.
+      </p>
+
+      <label>Secret code (1–9999)</label>
+      <input id="codeInput" type="number" min="1" max="9999" value="1234"/>
+
+      <div class="row">
+        <button id="btnSetCode" class="btn btn-secondary">Set Secret Code</button>
+        <div id="codeStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER: GUESS -->
+    <section class="card">
+      <h2> 2️⃣ Submit Encrypted Guess</h2>
+      <p>
+        Encrypt your guess; the contract will homomorphically compare it to the hidden code.
+      </p>
+
+      <label>Your guess (1–9999)</label>
+      <input id="guessInput" type="number" min="1" max="9999" value="1111"/>
+
+      <div class="row">
+        <button id="btnSubmitGuess" class="btn btn-success">Submit Guess</button>
+        <div id="guessStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="resultHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT RESULT -->
+    <section class="card">
+      <h2>3️⃣ Make Public & Decrypt Result</h2>
+      <p>
+        Make your last result public and decrypt it via Relayer.
+      </p>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get My Result Handle</button>
+        <button id="btnMakePublic" class="btn">Make My Result Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Result</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="guessResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>
+      Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6
+    </footer>
+  </div>
+
+  <script type="module">
+    import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+    import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+    const CONFIG = {
+      RELAYER_URL: "https://relayer.testnet.zama.org",
+      GATEWAY_URL: "https://gateway.testnet.zama.org",
+      CONTRACT_ADDRESS: "0x488bA6625C8CE7Eb830105F97e98ECA4f64ee31B"
+    };
+
+    const ABI = [
+      "function setSecretCode(bytes32,bytes) external",
+      "function submitGuess(bytes32,bytes) external returns (bytes32)",
+      "function makeMyResultPublic() external",
+      "function resultHandle(address) external view returns (bytes32)",
+      "function hasCode() external view returns (bool)",
+      "function hasPlayerResult(address) external view returns (bool)"
+    ];
+
+    let provider, signer, address, contract, relayer;
+    const $ = s => document.querySelector(s);
+
+    const log = (t,d) => console.log(`%c[${t}]`,"color:#38bdf8;font-weight:bold;",d);
+    const logError = (t,e) => console.error(`%c[ERROR: ${t}]`,"color:#ef4444;font-weight:bold;",e);
+    const logSuccess = (t,d) => console.log(`%c[SUCCESS: ${t}]`,"color:#10b981;font-weight:bold;",d);
+
+    const toHex = u8 => "0x" + Array.from(u8, b => b.toString(16).padStart(2,"0")).join("");
+
+    const setStatus = (id,msg,type="pending") => {
+      const el = $(id);
+      if (!el) return;
+      el.textContent = msg;
+      el.className = `status ${type}`;
+      el.style.display = "block";
+      log(`Status ${id}`, msg);
+    };
+
+    const clearStatus = id => {
+      const el = $(id);
+      if (el) el.style.display = "none";
+    };
+
+    function cleanHandle(raw) {
+      return String(raw).trim().split("\n").pop().trim();
+    }
+
+    async function connect() {
+      try {
+        log("Connect","Starting...");
+        if (!window.ethereum) throw new Error("MetaMask not installed");
+
+        provider = new BrowserProvider(window.ethereum);
+        log("Provider","Created");
+
+        await provider.send("eth_requestAccounts", []);
+        signer = await provider.getSigner();
+        address = await signer.getAddress();
+        log("Address", address);
+
+        contract = new Contract(getAddress(CONFIG.CONTRACT_ADDRESS), ABI, signer);
+        log("Contract", CONFIG.CONTRACT_ADDRESS);
+
+        $("#btnConnect").textContent = address.slice(0,6) + "…" + address.slice(-4);
+
+        if (!relayer) {
+          log("Relayer","initSDK...");
+          await initSDK();
+          relayer = await createInstance({
+            ...SepoliaConfig,
+            relayerUrl: CONFIG.RELAYER_URL,
+            gatewayUrl: CONFIG.GATEWAY_URL,
+            network: window.ethereum,
+            debug: true
+          });
+          logSuccess("Relayer","Instance created");
+        }
+
+        logSuccess("Connect","Ready");
+        return true;
+      } catch (e) {
+        logError("Connect", e);
+        setStatus("#codeStatus","❌ Wallet connection failed","error");
+        return false;
+      }
+    }
+
+    $("#btnConnect").onclick = connect;
+
+    async function encrypt16(value) {
+      if (!relayer) throw new Error("Relayer not initialized");
+
+      const enc = relayer.createEncryptedInput(
+        getAddress(CONFIG.CONTRACT_ADDRESS),
+        getAddress(address)
+      );
+      log("Encrypt16", `add16=${value}`);
+      enc.add16(BigInt(value));
+
+      const { handles, inputProof } = await enc.encrypt();
+      log("Encrypt16 Result", {
+        handleCount: handles.length,
+        proofLength: typeof inputProof === "string" ? inputProof.length : inputProof.length
+      });
+
+      const raw = handles[0]?.handle || handles[0]?.ciphertext || handles[0];
+      const handle = typeof raw === "string" ? raw : toHex(raw);
+
+      const attestation =
+        typeof inputProof === "string"
+          ? (inputProof.startsWith("0x") ? inputProof : "0x" + inputProof)
+          : toHex(inputProof);
+
+      return { handle, attestation };
+    }
+
+    // ===== SET CODE (ADMIN) =====
+    $("#btnSetCode").onclick = async () => {
+      try {
+        log("SetCode","Starting...");
+        if (!await connect()) return;
+
+        clearStatus("#codeStatus");
+        setStatus("#codeStatus","🔐 Encrypting door code…","pending");
+
+        const code = parseInt($("#codeInput").value);
+        if (code < 1 || code > 9999) throw new Error("Code must be in [1,9999]");
+
+        const { handle, attestation } = await encrypt16(code);
+        log("SetCode Args", {
+          handle: handle.slice(0,40) + "...",
+          attLen: attestation.length
+        });
+
+        setStatus("#codeStatus","⛓️ Sending tx…","pending");
+
+        const tx = await contract.setSecretCode(handle, attestation);
+        log("SetCode Tx", tx.hash);
+        const receipt = await tx.wait();
+        log("SetCode Receipt", {
+          blockNumber: receipt.blockNumber,
+          status: receipt.status
+        });
+
+        if (receipt.status !== 1) throw new Error("Transaction reverted");
+
+        setStatus("#codeStatus","✅ Secret code stored (encrypted)","success");
+      } catch (e) {
+        logError("SetCode", e);
+        setStatus("#codeStatus","❌ " + (e.message || e),"error");
+      }
+    };
+
+    // ===== SUBMIT GUESS =====
+    $("#btnSubmitGuess").onclick = async () => {
+      try {
+        log("SubmitGuess","Starting...");
+        if (!await connect()) return;
+
+        clearStatus("#guessStatus");
+        setStatus("#guessStatus","🧮 Encrypting guess…","pending");
+
+        const has = await contract.hasCode();
+        if (!has) throw new Error("Door code not set yet");
+
+        const guess = parseInt($("#guessInput").value);
+        if (guess < 1 || guess > 9999) throw new Error("Guess must be in [1,9999]");
+
+        const { handle, attestation } = await encrypt16(guess);
+        log("SubmitGuess Args", {
+          handle: handle.slice(0,40) + "...",
+          attLen: attestation.length
+        });
+
+        setStatus("#guessStatus","⛓️ Sending tx…","pending");
+
+        const tx = await contract.submitGuess(handle, attestation);
+        log("SubmitGuess Tx", tx.hash);
+        const receipt = await tx.wait();
+        log("SubmitGuess Receipt", {
+          blockNumber: receipt.blockNumber,
+          status: receipt.status
+        });
+
+        if (receipt.status !== 1) throw new Error("Transaction reverted");
+
+        setStatus("#guessStatus","📊 Fetching result handle…","pending");
+
+        const fh = await contract.resultHandle(address);
+        log("ResultHandle", fh);
+
+        $("#resultHandleOutput").textContent = "Result Handle:\n" + fh;
+        $("#resultHandleOutput").style.display = "block";
+
+        setStatus("#guessStatus","✅ Result stored","success");
+      } catch (e) {
+        logError("SubmitGuess", e);
+        setStatus("#guessStatus","❌ " + (e.message || e),"error");
+      }
+    };
+
+    // ===== GET HANDLE =====
+    $("#btnGetHandle").onclick = async () => {
+      try {
+        log("GetHandle","Starting...");
+        if (!await connect()) return;
+
+        setStatus("#decryptStatus","📊 Retrieving handle…","pending");
+        const fh = await contract.resultHandle(address);
+        log("Handle", fh);
+
+        $("#resultHandleOutput").textContent = "Result Handle:\n" + fh;
+        $("#resultHandleOutput").style.display = "block";
+
+        setStatus("#decryptStatus","✅ Handle retrieved","success");
+      } catch (e) {
+        logError("GetHandle", e);
+        setStatus("#decryptStatus","❌ " + (e.message || e),"error");
+      }
+    };
+
+    // ===== MAKE PUBLIC =====
+    $("#btnMakePublic").onclick = async () => {
+      try {
+        log("MakePublic","Starting...");
+        if (!await connect()) return;
+
+        setStatus("#decryptStatus","🔓 Making result public…","pending");
+
+        const tx = await contract.makeMyResultPublic();
+        log("MakePublic Tx", tx.hash);
+        const receipt = await tx.wait();
+        log("MakePublic Receipt", {
+          blockNumber: receipt.blockNumber,
+          status: receipt.status
+        });
+
+        if (receipt.status !== 1) throw new Error("Transaction reverted");
+
+        setStatus("#decryptStatus","✅ Result is now public","success");
+      } catch (e) {
+        logError("MakePublic", e);
+        setStatus("#decryptStatus","❌ " + (e.message || e),"error");
+      }
+    };
+
+    // ===== PUBLIC DECRYPT =====
+    async function decryptResult(rawHandle) {
+      if (!relayer) throw new Error("Relayer not initialized");
+
+      const handle = cleanHandle(rawHandle);
+      if (!handle.startsWith("0x") || handle.length !== 66)
+        throw new Error("Invalid handle format (must be bytes32)");
+
+      const request = [handle];
+      console.log("🔎 publicDecrypt request:", request);
+
+      const out = await relayer.publicDecrypt(request);
+      console.log("🔍 publicDecrypt output:", out);
+
+      if (!out || typeof out !== "object" || !out.clearValues)
+        throw new Error("Invalid decrypt response (no clearValues)");
+
+      const v =
+        out.clearValues[handle] ??
+        out.clearValues[handle.toLowerCase()];
+
+      if (v === undefined) throw new Error("Decrypt produced no value");
+
+      console.log("🔐 clear value:", v);
+      return Number(v); // 0,1,2
+    }
+
+    // ===== DECRYPT BUTTON =====
+    $("#btnDecrypt").onclick = async () => {
+      try {
+        await connect();
+
+        const raw = $("#resultHandleOutput").textContent.trim();
+        const handle = cleanHandle(raw);
+        console.log("Decrypting handle:", handle);
+
+        setStatus("#decryptStatus","🔓 Decrypting via relayer…","pending");
+        const code = await decryptResult(handle);
+
+        const resultDiv = $("#guessResult");
+        let title, desc, cls="match-result";
+
+        if (code === 0) {
+          title = "✅ CORRECT CODE!";
+          desc = "Your encrypted guess exactly matches the hidden door code.";
+        } else if (code === 1) {
+          title = "⬇️ TOO LOW";
+          desc = "Your encrypted guess is lower than the hidden door code.";
+        } else {
+          title = "⬆️ TOO HIGH";
+          desc = "Your encrypted guess is higher than the hidden door code.";
+        }
+
+        if (code !== 0) cls = "match-result no-match";
+
+        resultDiv.className = cls;
+        resultDiv.innerHTML =
+          `<div style="font-size:1.2rem;font-weight:600;margin-bottom:8px;">${title}</div>
+           <div style="color:#d1d5db;font-size:14px;">${desc}</div>`;
+        resultDiv.style.display = "block";
+
+        setStatus("#decryptStatus","✅ Result decrypted","success");
+      } catch (e) {
+        console.error("Decrypt failed:", e);
+        setStatus("#decryptStatus","❌ " + (e.message || e),"error");
+      }
+    };
+
+    log("Script","✅ All handlers attached and ready");
+  </script>
+</body>
+</html>
