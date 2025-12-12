@@ -3,13 +3,11 @@ image: alpine
 pages:
   stage: deploy
   script:
-  - mkdir -p public
-  - cp -r 2_* 54_* 78_* 79_* 80_* 81_* 82_* 83_* 84_* 85_* 90_* 98_* public/ 2>/dev/null || true
-artifacts:
+    - mkdir -p public
+    - cp -r 2_* 54_* 78_* 79_* 80_* 81_* 82_* 83_* 84_* 85_* 90_* 98_* public/ 2>/dev/null || true
+  artifacts:
     paths:
       - public
   only:
     - main
-
-
 
