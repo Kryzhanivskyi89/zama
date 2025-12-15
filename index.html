@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAMA dApps Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./index.css" />
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div class="title-row">
+        <h1>
+          ZAMA dApps Collection
+          <span class="badge">FHEVM · Solidity · Frontend</span>
+        </h1>
+      </div>
+      <p class="subtitle">
+        Колекція інтерактивних FHEVM/dApp прототипів: ігрові механіки, приватні обчислення,
+        метрики, гейміфікація й прикладні сценарії поверх зашифрованих даних.
+      </p>
+      <div class="meta">
+        <span id="meta-count">0 dApps</span>
+        <span>Monorepo · GitHub Pages</span>
+        <span>Чистий фронт без бекенду</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="grid" id="dapps-grid"></div>
+    </main>
+
+    <footer>
+      Generated as a static gallery for quick preview of FHEVM dApps.
+      Code:
+      <a href="https://github.com/Kryzhanivskyi89/zama" target="_blank" rel="noopener noreferrer">
+        github.com/Kryzhanivskyi89/zama
+      </a>
+    </footer>
+  </div>
+
+  <script src="./data.js"></script>
+  <script type="module" src="./index.js">
+   
+  </script>
+</body>
+</html>

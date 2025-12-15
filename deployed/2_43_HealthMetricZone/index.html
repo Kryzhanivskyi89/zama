@@ -4,7 +4,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Health Metric Zone — Zama FHEVM</title>
-  <style>
+  <link rel="stylesheet" href="./index.css" />
+  <!-- <style>
   :root {
     --bg-main: #020816;
     --bg-panel: rgba(6, 16, 40, 0.9);
@@ -421,7 +422,7 @@
       font-size: 11px;
     }
   }
-</style>
+</style> -->
 
 </head>
 <body>
@@ -512,7 +513,8 @@
   <footer> Logs are printed to console.
       <span class="tag">SDK v0.3.x · publicDecrypt</span></footer>
 </div>
-<script type="module">
+<script type="module" src="./index.js"></script>
+<!-- <script type="module">
   import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
   import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
 
@@ -790,6 +792,6 @@
 
   // initial log
   console.log("Health Metric Zone UI loaded. All actions log to console.");
-</script>
+</script> -->
 </body>
 </html>
