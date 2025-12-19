@@ -554,15 +554,18 @@
   </div>
 
   <script type="module">
-    import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+    import {initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-6/relayer-sdk-js.js";
     import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
 
-    const CONFIG = {
-      RELAYER_URL: "https://relayer.testnet.zama.org",
-      GATEWAY_URL: "https://gateway.testnet.zama.org",
+    const ORIGIN = window.location.origin;
+
+
+const CONFIG = {
+  RELAYER_URL: `${ORIGIN}/relayer`,
+  GATEWAY_URL: `${ORIGIN}/gateway`,
       CONTRACT_ADDRESS: "0xb71149246863D63f93C62B95E0831623D17a8EA1"
     };
-
+console.log("Config:", CONFIG.RELAYER_URL);
     const ABI = [
       "function setSecretWeight(bytes32,bytes) external",
       "function submitGuess(bytes32,bytes) external returns (bytes32)",
