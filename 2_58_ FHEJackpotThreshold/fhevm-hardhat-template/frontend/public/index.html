@@ -512,36 +512,36 @@
   </div>
 
   <script type="module">
-    // import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
-    // import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+    import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+    import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
 
-    // const CONFIG = {
-    //   RELAYER_URL: "https://relayer.testnet.zama.org",
-    //   GATEWAY_URL: "https://gateway.testnet.zama.org",
-    //   CONTRACT_ADDRESS: "0x303d23b1C0f9ae34328aFa4435D0441cAEBF0035"
-    // };
+    const CONFIG = {
+      RELAYER_URL: "https://relayer.testnet.zama.org",
+      GATEWAY_URL: "https://gateway.testnet.zama.org",
+      CONTRACT_ADDRESS: "0x303d23b1C0f9ae34328aFa4435D0441cAEBF0035"
+    };
 
-    import {
-  initSDK,
-  createInstance,
-  SepoliaConfig,
-} from "https://cdn.zama.org/relayer-sdk-js/0.3.0-6/relayer-sdk-js.js";
+//     import {
+//   initSDK,
+//   createInstance,
+//   SepoliaConfig,
+// } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-6/relayer-sdk-js.js";
 
-import {
-  BrowserProvider,
-  Contract,
-  getAddress,
-  keccak256,
-  toUtf8Bytes,
-} from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+// import {
+//   BrowserProvider,
+//   Contract,
+//   getAddress,
+//   keccak256,
+//   toUtf8Bytes,
+// } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
 
-const ORIGIN = window.location.origin;
+// const ORIGIN = window.location.origin;
 
-const CONFIG = {
-  RELAYER_URL: `${ORIGIN}/relayer`,
-  GATEWAY_URL: `${ORIGIN}/gateway`,
-  CONTRACT_ADDRESS: "0x303d23b1C0f9ae34328aFa4435D0441cAEBF0035",
-};
+// const CONFIG = {
+//   RELAYER_URL: `${ORIGIN}/relayer`,
+//   GATEWAY_URL: `${ORIGIN}/gateway`,
+//   CONTRACT_ADDRESS: "0x303d23b1C0f9ae34328aFa4435D0441cAEBF0035",
+// };
 
     const ABI = [
       "function setJackpotThreshold(bytes32,bytes) external",
