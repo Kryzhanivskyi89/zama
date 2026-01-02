@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Encrypted Dice Arena — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+ 
+
+</head>
+<body>
+  <div class="arena-shell">
+    <header class="arena-header">
+      <div class="arena-title-wrap">
+        <div class="arena-icon">🎲</div>
+        <div class="arena-title-block">
+          <h1>Encrypted Dice Arena</h1>
+          <p>Player and bot roll in secret — only the outcome code (lose/draw/win) is revealed.</p>
+        </div>
+      </div>
+      <div class="arena-meta">
+        <span>Local whitepaper:</span>
+        <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+        <button id="btnConnect">Connect Wallet</button>
+        <div id="connectStatus"></div>
+      </div>
+    </header>
+
+    <div class="arena-grid">
+      <!-- Left: you vs bot -->
+      <section class="board">
+        <div class="board-header">Round setup</div>
+        <div class="board-grid">
+          <div class="side-card">
+            <div class="side-header">
+              <div class="side-label">You</div>
+              <span class="side-pill you">Player</span>
+            </div>
+            <label>Choose your roll (1–6)</label>
+            <select id="playerRoll">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+          <div class="side-card">
+            <div class="side-header">
+              <div class="side-label">Bot</div>
+              <span class="side-pill bot">Random</span>
+            </div>
+            <p style="margin:0; font-size:12px; color:var(--text-muted);">
+              Frontend generates a secret bot roll for this round, encrypts it, and sends both rolls to the contract.
+            </p>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="btnGenBotPlay" class="btn">Generate Bot &amp; Play</button>
+        </div>
+
+        <div id="playStatus"></div>
+        <pre id="roundHandleOut" style="display:none;">—</pre>
+      </section>
+
+      <!-- Right: outcome panel -->
+      <section class="result-panel">
+        <div class="result-header">
+          <div class="result-title">Outcome preview</div>
+          <div class="result-badge">0 · lose · 1 · draw · 2 · win</div>
+        </div>
+        <div>
+          <div class="result-face draw">•</div>
+          <div id="resultBox" style="display:none;"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom: make public + decrypt -->
+    <section class="bottom-strip">
+      <div class="bottom-grid">
+        <div>
+          <div class="bottom-block-title">Make result public</div>
+          <p class="bottom-desc">
+            After a round, opt‑in to let others decrypt only the last outcome (0/1/2) for your address.
+          </p>
+          <div class="row">
+            <button id="btnMakePublic" class="btn">Make My Result Public</button>
+          </div>
+          <div id="makeStatus"></div>
+        </div>
+        <div>
+          <div class="bottom-block-title">Get &amp; decrypt result</div>
+          <p class="bottom-desc">
+            Anyone can fetch an encrypted result handle for an address that opted in and run a public decrypt.
+          </p>
+
+          <label>Address to check</label>
+          <input id="fetchAddr" type="text" placeholder="0x..." />
+
+          <div class="row" style="margin-top:8px;">
+            <button id="btnGetHandle" class="btn">Get Result Handle</button>
+            <button id="btnDecrypt" class="btn">Public Decrypt</button>
+          </div>
+
+          <div id="decryptStatus"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      All important logs are printed to console.
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Secret Weight Guess — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+  
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1><span>Secret Weight Guess</span></h1>
+        <p>Set a hidden weight, let players submit encrypted guesses, and reveal how close they really are — without exposing the truth.</p>
+      </div>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- ADMIN: SET WEIGHT -->
+    <section class="card">
+      <h2>1️⃣ Set Encrypted Weight</h2>
+      <p>
+        Encrypt the true weight of the object (e.g. in grams). Players only see feedback levels.
+      </p>
+
+      <label>Secret weight (uint16)</label>
+      <input id="weightInput" type="number" min="0" max="65535" value="123"/>
+
+      <div class="row">
+        <button id="btnSetWeight" class="btn btn-secondary">Set Secret Weight</button>
+        <div id="weightStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER: GUESS -->
+    <section class="card">
+      <h2>2️⃣ Submit Encrypted Guess</h2>
+      <p>
+        Encrypt your guess; the contract will homomorphically measure how close you are.
+      </p>
+
+      <label>Your guess (uint16)</label>
+      <input id="guessInput" type="number" min="0" max="65535" value="120"/>
+
+      <div class="row">
+        <button id="btnSubmitGuess" class="btn btn-success">Submit Guess</button>
+        <div id="guessStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="feedbackHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT FEEDBACK -->
+    <section class="card">
+      <h2>3️⃣ Make Public & Decrypt Feedback</h2>
+      <p>
+        Make your last feedback public and decrypt it via Relayer.
+      </p>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get My Feedback Handle</button>
+        <button id="btnMakePublic" class="btn">Make My Feedback Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Feedback</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="feedbackResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>
+      Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+  
+</body>
+</html>

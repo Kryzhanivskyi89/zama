@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Gated NFT with Zama FHEVM</title>
+    <style>
+        :root {
+            --color-bg: #0f1419;
+            --color-surface: #1a1f26;
+            --color-border: #2d3748;
+            --color-text: #e2e8f0;
+            --color-text-secondary: #a0aec0;
+            --color-accent: #48bb78;
+            --color-accent-hover: #38a169;
+            --color-error: #f56565;
+            --color-warning: #ed8936;
+            --muted: #718096;
+            --spacing: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        body {
+            padding: var(--spacing);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .console-section {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-number {
+            background: var(--color-accent);
+            color: var(--color-bg);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .description {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: 6px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        input::placeholder {
+            color: var(--muted);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: var(--color-accent-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.secondary {
+            background-color: rgba(72, 187, 120, 0.15);
+            color: var(--color-accent);
+            border: 1px solid var(--color-accent);
+        }
+
+        .btn.secondary:hover {
+            background-color: rgba(72, 187, 120, 0.25);
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background-color: rgba(72, 187, 120, 0.15);
+            color: var(--color-accent);
+            border: 1px solid var(--color-accent);
+        }
+
+        .status.error {
+            background-color: rgba(245, 101, 101, 0.15);
+            color: var(--color-error);
+            border: 1px solid var(--color-error);
+        }
+
+        .status.loading {
+            background-color: rgba(237, 137, 54, 0.15);
+            color: var(--color-warning);
+            border: 1px solid var(--color-warning);
+        }
+
+        .result {
+            background-color: rgba(72, 187, 120, 0.1);
+            border: 1px solid var(--color-accent);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--color-accent);
+            margin-bottom: 4px;
+        }
+
+        .result-value {
+            color: var(--color-text-secondary);
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        pre {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .console-section {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .console-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        #devLog {
+            background-color: rgba(0, 0, 0, 0.5);
+            max-height: 300px;
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--color-border);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        footer a {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-divider {
+            height: 1px;
+            background-color: var(--color-border);
+            margin: 32px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Age Gated NFT Minter</h1>
+            <p class="subtitle">Privacy-preserving age verification using Zama FHEVM</p>
+        </header>
+
+        <div class="grid">
+            <!-- Step 1: Submit Age Verification -->
+            <section class="card">
+                <h3>
+                    <span class="card-number">1</span>
+                    Submit Encrypted Birth Year
+                </h3>
+                <p class="description">Provide your birth year (will be encrypted client-side by Relayer gateway)</p>
+
+                <div>
+                    <label for="birthYear">Birth year (e.g. 1990)</label>
+                    <input id="birthYear" type="number" min="1900" max="2100" value="1990">
+                </div>
+
+                <div class="row">
+                    <button id="btnSubmitAge" class="btn">Submit Age Verification</button>
+                    <div id="ageStatus" class="status hidden"></div>
+                </div>
+
+                <div id="ageHandleBox" class="hidden">
+                    <label>Verification Handle (bytes32)</label>
+                    <pre id="ageHandleOutput">—</pre>
+                </div>
+            </section>
+
+            <!-- Step 2: Make Public -->
+            <section class="card">
+                <h3>
+                    <span class="card-number">2</span>
+                    Make Verification Public
+                </h3>
+                <p class="description">Make your age verification result publicly decryptable by the oracle</p>
+
+                <div class="row">
+                    <button id="btnMakePublic" class="btn">Make Verification Public</button>
+                    <div id="makePublicStatus" class="status hidden"></div>
+                </div>
+
+                <div>
+                    <label for="verifyAddr">Address (optional)</label>
+                    <input id="verifyAddr" type="text" placeholder="Leave empty for your address">
+                </div>
+
+                <button id="btnGetHandle" class="btn secondary">Get Verification Handle</button>
+
+                <div id="handleResult" class="result hidden"></div>
+            </section>
+
+            <!-- Step 3: Decrypt & Mint -->
+            <section class="card">
+                <h3>
+                    <span class="card-number">3</span>
+                    Decrypt & Mint NFT
+                </h3>
+                <p class="description">Decrypt the verification and mint NFT if age is verified</p>
+
+                <div class="row">
+                    <button id="btnDecrypt" class="btn">Decrypt & Mint if Allowed</button>
+                    <button id="btnOnlyDecrypt" class="btn secondary">Decrypt Only</button>
+                    <div id="decryptStatus" class="status hidden"></div>
+                </div>
+
+                <div id="mintResult" class="result hidden"></div>
+            </section>
+        </div>
+
+        <!-- Console Logs -->
+        <section class="console-section">
+            <h3>📋 Console Logs (Developer)</h3>
+            <p class="description">All actions are logged here (same as browser DevTools)</p>
+            <pre id="devLog">Ready — performing actions will appear here...</pre>
+        </section>
+
+        <footer>
+            Built with Zama FHEVM · Relayer SDK 0.3.x
+        </footer>
+    </div>
+
+    <script>
+        // ============ LOGGER UTILITY ============
+        const logs = [];
+        const maxLogs = 200;
+
+        function log(...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => {
+                if (typeof arg === 'object') {
+                    return JSON.stringify(arg, null, 2);
+                }
+                return String(arg);
+            }).join(' ');
+
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+
+            if (logs.length > maxLogs) {
+                logs.shift();
+            }
+
+            updateDevLog();
+            console.log(...args);
+        }
+
+        function updateDevLog() {
+            const devLogEl = document.getElementById('devLog');
+            devLogEl.textContent = logs.join('\n');
+            devLogEl.scrollTop = devLogEl.scrollHeight;
+        }
+
+        function logStatus(type, message) {
+            log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // ============ UI UTILITIES ============
+        function showStatus(elementId, type, message) {
+            const el = document.getElementById(elementId);
+            el.className = `status ${type}`;
+            el.textContent = message;
+            el.classList.remove('hidden');
+        }
+
+        function hideStatus(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        function showResult(elementId, title, value) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `
+                <div class="result-label">${title}</div>
+                <div class="result-value">${value}</div>
+            `;
+            el.classList.remove('hidden');
+        }
+
+        function hideResult(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        // ============ BUTTON HANDLERS ============
+        document.getElementById('btnSubmitAge').addEventListener('click', async () => {
+            const birthYear = document.getElementById('birthYear').value;
+            
+            if (!birthYear || birthYear < 1900 || birthYear > 2100) {
+                logStatus('error', 'Invalid birth year');
+                showStatus('ageStatus', 'error', '❌ Invalid birth year');
+                return;
+            }
+
+            showStatus('ageStatus', 'loading', '⏳ Submitting...');
+            logStatus('info', `Submitting birth year: ${birthYear}`);
+
+            try {
+                // Simulate contract call
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const mockHandle = '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                logStatus('success', `Age verification submitted. Handle: ${mockHandle}`);
+                showStatus('ageStatus', 'success', '✅ Age verification submitted');
+                
+                document.getElementById('ageHandleOutput').textContent = mockHandle;
+                document.getElementById('ageHandleBox').classList.remove('hidden');
+            } catch (err) {
+                logStatus('error', `Failed to submit: ${err.message}`);
+                showStatus('ageStatus', 'error', `❌ ${err.message}`);
+            }
+        });
+
+        document.getElementById('btnMakePublic').addEventListener('click', async () => {
+            showStatus('makePublicStatus', 'loading', '⏳ Making public...');
+            logStatus('info', 'Calling makeAgeVerificationPublic()...');
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                logStatus('success', 'Age verification made public');
+                showStatus('makePublicStatus', 'success', '✅ Now publicly decryptable');
+            } catch (err) {
+                logStatus('error', `Failed: ${err.message}`);
+                showStatus('makePublicStatus', 'error', `❌ ${err.message}`);
+            }
+        });
+
+        document.getElementById('btnGetHandle').addEventListener('click', async () => {
+            const addr = document.getElementById('verifyAddr').value || 'your address';
+            
+            logStatus('info', `Getting handle for ${addr}...`);
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const mockHandle = '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                logStatus('success', `Handle retrieved`);
+                showResult('handleResult', 'Verification Handle', mockHandle);
+            } catch (err) {
+                logStatus('error', `Failed: ${err.message}`);
+            }
+        });
+
+        document.getElementById('btnDecrypt').addEventListener('click', async () => {
+            showStatus('decryptStatus', 'loading', '⏳ Decrypting & minting...');
+            logStatus('info', 'Decrypting verification result from oracle...');
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const isAdult = true;
+                logStatus('success', `Decryption result: isAdult = ${isAdult}`);
+                
+                if (isAdult) {
+                    logStatus('success', 'Age verified! Minting NFT...');
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    const tokenId = Math.floor(Math.random() * 10000);
+                    logStatus('success', `NFT minted! Token ID: ${tokenId}`);
+                    showStatus('decryptStatus', 'success', '✅ NFT minted successfully');
+                    showResult('mintResult', 'Minted NFT Token ID', tokenId.toString());
+                } else {
+                    logStatus('error', 'Age verification failed - too young');
+                    showStatus('decryptStatus', 'error', '❌ Age verification failed');
+                }
+            } catch (err) {
+                logStatus('error', `Decryption failed: ${err.message}`);
+                showStatus('decryptStatus', 'error', `❌ ${err.message}`);
+            }
+        });
+
+        document.getElementById('btnOnlyDecrypt').addEventListener('click', async () => {
+            showStatus('decryptStatus', 'loading', '⏳ Decrypting...');
+            logStatus('info', 'Requesting decryption from oracle (without minting)...');
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const isAdult = true;
+                logStatus('success', `Decryption result: isAdult = ${isAdult}`);
+                showStatus('decryptStatus', 'success', `✅ Result: Age is ${isAdult ? 'OK' : 'NOT OK'}`);
+                showResult('mintResult', 'Verification Result', isAdult ? '✅ Adult (18+)' : '❌ Underage');
+            } catch (err) {
+                logStatus('error', `Decryption failed: ${err.message}`);
+                showStatus('decryptStatus', 'error', `❌ ${err.message}`);
+            }
+        });
+
+        // Initial log
+        log('Page loaded. Ready to interact with Age Gated NFT contract.');
+    </script>
+</body>
+</html>

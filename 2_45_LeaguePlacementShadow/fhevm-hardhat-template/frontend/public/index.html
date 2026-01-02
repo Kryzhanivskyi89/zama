@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>League Placement Shadow — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="header-icon">🏆</div>
+      <div class="header-main">
+        <h1 class="app-title">League Placement Shadow</h1>
+        <p class="app-subtitle">
+          Players submit encrypted scores. The contract reveals only their league — never the raw points.
+        </p>
+      </div>
+      <div class="header-pill">Encrypted ladder · FHEVM</div>
+    </header>
+
+    <div class="layout">
+      <div>
+        <div class="card card--intro">
+          <div class="card-header-line">
+            <h1>Placement Flow</h1>
+            <span class="card-tag">Tournament session</span>
+          </div>
+          <p class="card-desc">
+            Connect your wallet, post scores, and let the contract assign a hidden league rank.
+          </p>
+          <p class="card-meta">
+            Local whitepaper: <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+          </p>
+          <div style="margin-top:10px;">
+            <button id="btnConnect" class="btn">Connect Wallet</button>
+            <div id="connectStatus" class="status"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">1</span>Player — Encrypted Score</h2>
+            <span class="card-tag">Player action</span>
+          </div>
+          <p class="card-desc">
+            Enter your tournament points. They are encrypted client‑side; only a league code is computed.
+          </p>
+
+          <label>Score (points)</label>
+          <input id="scoreValue" type="number" min="0" max="100000" value="1250" />
+
+          <div class="row">
+            <button id="btnSubmitScore" class="btn">Encrypt &amp; Submit Score</button>
+          </div>
+          <div id="scoreStatus" class="status"></div>
+          <pre id="scoreHandleOut" style="display:none;">—</pre>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">2</span>Compute League</h2>
+            <span class="card-tag">On‑chain compute</span>
+          </div>
+          <p class="card-desc">
+            The contract maps your encrypted score to a league tier (Iron, Bronze, Silver, Gold).
+          </p>
+
+          <label>Player address (compute for)</label>
+          <input id="computeAddr" type="text" placeholder="0x..." />
+
+          <div class="row">
+            <button id="btnComputeLeague" class="btn">Compute League</button>
+          </div>
+          <div id="computeStatus" class="status"></div>
+          <pre id="leagueHandleOut" style="display:none;">—</pre>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">3</span>Make My League Public</h2>
+            <span class="card-tag">Opt‑in reveal</span>
+          </div>
+          <p class="card-desc">
+            Player chooses to reveal the league code. Underlying score remains hidden forever.
+          </p>
+
+          <div class="row">
+            <button id="btnMakePublic" class="btn">Make My League Public</button>
+          </div>
+          <div id="makeStatus" class="status"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">4</span>Get &amp; Decrypt League</h2>
+            <span class="card-tag">Public view</span>
+          </div>
+          <p class="card-desc">
+            Fetch the league handle for any address that opted in, then run a public decrypt.
+          </p>
+
+          <label>Address to fetch</label>
+          <input id="fetchAddr" type="text" placeholder="0x..." />
+
+          <div class="row" style="margin-top:8px;">
+            <button id="btnGetHandle" class="btn">Get League Handle</button>
+            <button id="btnDecrypt" class="btn">Public Decrypt</button>
+          </div>
+          <div id="decryptStatus" class="status"></div>
+          <div id="leagueResult" class="result" style="display:none;"></div>
+        </div>
+      </div>
+
+      <aside class="league-panel">
+        <h3 class="league-title">League tiers</h3>
+        <p class="league-subtitle">Only the tier label (0–3) leaves the encrypted arena.</p>
+
+        <div class="league-grid">
+          <div class="league-card league-card--iron">
+            <div class="league-medal">🥉</div>
+            <div class="league-info">
+              <div class="league-name">Iron</div>
+              <div class="league-range">Entry bracket — learning stage.</div>
+            </div>
+            <span class="league-tag">Code 0</span>
+          </div>
+
+          <div class="league-card league-card--bronze">
+            <div class="league-medal">🥉</div>
+            <div class="league-info">
+              <div class="league-name">Bronze</div>
+              <div class="league-range">Core players — solid footing.</div>
+            </div>
+            <span class="league-tag">Code 1</span>
+          </div>
+
+          <div class="league-card league-card--silver">
+            <div class="league-medal">🥈</div>
+            <div class="league-info">
+              <div class="league-name">Silver</div>
+              <div class="league-range">Advanced bracket — consistent wins.</div>
+            </div>
+            <span class="league-tag">Code 2</span>
+          </div>
+
+          <div class="league-card league-card--gold">
+            <div class="league-medal">🥇</div>
+            <div class="league-info">
+              <div class="league-name">Gold</div>
+              <div class="league-range">Top contenders — tournament elites.</div>
+            </div>
+            <span class="league-tag">Code 3</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      Local whitepaper: <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+      <span class="tag">Encrypted leagues · public codes</span>
+    </footer>
+  </div>
+
+  
+<script type="module" src="./index.js"></script>
+</body>
+</html>

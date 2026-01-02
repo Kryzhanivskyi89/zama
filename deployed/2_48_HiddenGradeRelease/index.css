@@ -1,0 +1,436 @@
+ :root {
+    --bg-main: #fdfcf5;
+    --bg-surface: #ffffff;
+    --border-strong: #111827;
+    --border-soft: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --accent-blue: #2563eb;
+    --accent-purple: #7c3aed;
+    --accent-green: #16a34a;
+    --accent-red: #dc2626;
+    --radius-lg: 18px;
+    --radius-md: 10px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    padding: 32px 16px 28px;
+    background:
+      radial-gradient(circle at 0 0, rgba(191, 219, 254, 0.6) 0, transparent 55%),
+      radial-gradient(circle at 100% 100%, rgba(254, 202, 202, 0.7) 0, transparent 55%),
+      #fefce8;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 960px;
+  }
+
+  /* Header: компактний, не «банер» */
+
+  .app-header {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border-strong);
+    box-shadow: 4px 4px 0 #111827;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: #111827;
+    color: #fef9c3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .header-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .app-subtitle {
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .header-meta {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .header-meta code {
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: #f3f4f6;
+    border: 1px solid var(--border-strong);
+    font-size: 10px;
+  }
+
+  @media screen and (min-width: 768px) {
+    body {
+      padding: 36px 24px 30px;
+    }
+
+    .app-title {
+      font-size: 20px;
+    }
+  }
+
+  /* Основний layout: горизонтальна лінія кроків */
+
+  .flow-shell {
+    background: var(--bg-surface);
+    border-radius: 18px;
+    border: 1.5px solid var(--border-strong);
+    box-shadow: 6px 6px 0 #111827;
+    padding: 14px 14px 16px;
+  }
+
+  .flow-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .flow-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .flow-connect {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .status {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .status::before {
+    content: "• ";
+    color: var(--accent-purple);
+  }
+
+  #connectStatus.status::before {
+    content: "";
+  }
+
+  /* Кнопка Connect компактна */
+
+  .btn-connect {
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border-strong);
+    background: #111827;
+    color: #f9fafb;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  .btn-connect:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  .btn-connect:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0 #000000;
+  }
+
+  /* Лінія кроків (горизонтальна) */
+
+  .steps-track {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .step-pill {
+    position: relative;
+    padding: 8px 9px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border-strong);
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .step-pill-main {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .step-index {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    background: #ffffff;
+  }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .step-note {
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+
+  /* Зона з формами — 2 колонки на десктопі */
+
+  .forms-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+    gap: 12px;
+  }
+
+  @media screen and (max-width: 820px) {
+    .forms-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .panel {
+    border-radius: 14px;
+    border: 1.5px solid var(--border-soft);
+    padding: 12px 12px 10px;
+    background: #f9fafb;
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 6px;
+  }
+
+  .panel-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0 0 8px;
+  }
+
+  label {
+    display: block;
+    margin-top: 8px;
+    margin-bottom: 3px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  input,
+  button,
+  select {
+    padding: 9px 10px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border-strong);
+    background: #ffffff;
+    color: var(--text-primary);
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+
+  input::placeholder {
+    color: #9ca3af;
+  }
+
+  input:focus-visible,
+  select:focus-visible {
+    box-shadow: 2px 2px 0 #111827;
+    transform: translate(-1px, -1px);
+  }
+
+  .row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  button.btn {
+    cursor: pointer;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: #f9fafb;
+    background: #111827;
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  button.btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  button.btn:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0 #000000;
+  }
+
+  button.btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+    box-shadow: 2px 2px 0 #6b7280;
+  }
+
+  pre {
+    margin-top: 8px;
+    background: #f3f4f6;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-strong);
+    overflow: auto;
+    font-size: 12px;
+    color: #111827;
+  }
+
+  /* Панель результату внизу */
+
+  .result-panel {
+    margin-top: 14px;
+    padding: 12px 12px 10px;
+    border-radius: 16px;
+    border: 2px solid var(--border-strong);
+    background: #eef2ff;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+    gap: 10px;
+  }
+
+  @media screen and (max-width: 640px) {
+    .result-panel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .result-main-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  .grade-letter-display {
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .grade-letter-display.pass {
+    color: var(--accent-green);
+  }
+
+  .grade-letter-display.fail {
+    color: var(--accent-red);
+  }
+
+  .result-extra {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .result-raw {
+    font-size: 12px;
+    border-radius: 12px;
+    padding: 8px 9px;
+    background: #ffffff;
+    border: 1.5px dashed var(--border-soft);
+  }
+
+  .result-raw-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  /* Вбудований контейнер для gradeResult */
+
+  #gradeResult {
+    margin-top: 6px;
+    padding: 8px 9px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1.5px solid var(--border-soft);
+    font-size: 12px;
+  }
+
+  /* Footer простий текстовий */
+
+  footer {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: left;
+  }
+
+  footer code {
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: #f3f4f6;
+    border: 1px solid var(--border-strong);
+  }

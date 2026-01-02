@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Private Cashback Tier — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+
+
+</head>
+<body>
+  <div class="app">
+    <div class="app-header">
+      <div class="app-title-wrap">
+        <div class="app-icon">💳</div>
+        <div class="app-title-block">
+          <h1>Private Cashback Tier</h1>
+          <p>Only your cashback percentage is revealed — spending stays private.</p>
+        </div>
+      </div>
+      <div class="app-conn">
+        <code id="contractAddr">0x6f21FBA7E57A3766057bAfC8CAA855257D9426C2</code>
+        <button id="btnConnect">Connect Wallet</button>
+        <div id="connectStatus" class="status"></div>
+      </div>
+    </div>
+
+    <!-- 1) Submit turnover -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">1 · Encrypted turnover</div>
+        <div class="section-tag">card usage</div>
+      </div>
+      <p class="section-desc">
+        Provide your total card turnover as an integer (e.g. cents or units). Only ciphertext is stored on‑chain.
+      </p>
+
+      <label>Turnover (0–100000)</label>
+      <input id="turnover" type="number" min="0" max="100000" value="25000" />
+
+      <div class="row">
+        <button id="btnSubmitTurnover" class="btn">Encrypt &amp; Submit Turnover</button>
+      </div>
+      <div id="submitStatus" class="status"></div>
+      <pre id="tierHandleOut" style="display:none;">—</pre>
+    </section>
+
+    <!-- 2) Make tier public -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">2 · Make tier public</div>
+        <div class="section-tag">visibility</div>
+      </div>
+      <p class="section-desc">
+        Opt‑in to let others decrypt only your cashback tier (1 / 2 / 3). Your exact turnover value remains hidden.
+      </p>
+
+      <div class="row">
+        <button id="btnMakePublic" class="btn">Make My Tier Public</button>
+      </div>
+      <div id="makeStatus" class="status"></div>
+    </section>
+
+    <!-- 3) Get & decrypt -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">3 · Get &amp; decrypt tier</div>
+        <div class="section-tag">public lookup</div>
+      </div>
+      <p class="section-desc">
+        Anyone can fetch the tier handle for an address that opted in and run a public decrypt to see the tier code.
+      </p>
+
+      <label>Address to fetch tier for</label>
+      <input id="fetchAddr" type="text" placeholder="0x..." />
+
+      <div class="row" style="margin-top:8px;">
+        <button id="btnGetHandle" class="btn">Get Tier Handle</button>
+        <button id="btnDecrypt" class="btn">Public Decrypt</button>
+      </div>
+
+      <div id="decryptStatus" class="status"></div>
+      <div id="tierResult" class="result" style="display:none;"></div>
+    </section>
+
+    <footer>
+      Logs printed to console. Local whitepaper:
+      <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+
+</body>
+</html>

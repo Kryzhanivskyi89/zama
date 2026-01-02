@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Encrypted Math Duel — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css"/>
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧮 Encrypted Math Duel</h1>
+      <button id="btnConnect">Connect Wallet</button>
+    </header>
+
+    <!-- 1. CREATE DUEL (CORRECT ANSWER) -->
+    <section class="card">
+      <h2>1. Create Duel (Correct Answer)</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Encrypt the correct answer to a math puzzle and create a duel by its duelId (bytes32).
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Duel Key (any string, e.g. "duel-1")</label>
+          <input id="duelKey" type="text" placeholder="duel-1" value="duel-1" />
+        </div>
+        <div class="col">
+          <label>Correct Answer (0–65535)</label>
+          <input id="correctAnswer" type="number" min="0" max="65535" value="42" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnCreateDuel" class="success">Create Duel (Encrypt Correct)</button>
+      </div>
+      <div id="createStatus" class="status"></div>
+      <pre id="createLog" style="display:none;"></pre>
+    </section>
+
+    <!-- 2. PLAYER GUESSES -->
+    <section class="card">
+      <h2>2. Submit Player Guesses</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Each player encrypts a guess and submits it to the same duel.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Duel Key (must match created duel)</label>
+          <input id="guessDuelKey" type="text" placeholder="duel-1" value="duel-1" />
+        </div>
+        <div class="col">
+          <label>Player 1 Guess (0–65535)</label>
+          <input id="guess1" type="number" min="0" max="65535" value="40" />
+        </div>
+        <div class="col">
+          <label>Player 2 Guess (0–65535)</label>
+          <input id="guess2" type="number" min="0" max="65535" value="55" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnSubmitGuess1">Submit Guess for Player 1</button>
+        <button id="btnSubmitGuess2" class="secondary">Submit Guess for Player 2</button>
+      </div>
+      <div id="guessStatus" class="status"></div>
+      <pre id="guessLog" style="display:none;"></pre>
+    </section>
+
+    <!-- 3. COMPUTE WINNER -->
+    <section class="card">
+      <h2>3. Compute Winner (Homomorphic)</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Encrypt zero once, compute the winner homomorphically, and store the encrypted winner code.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Duel Key</label>
+          <input id="winnerDuelKey" type="text" placeholder="duel-1" value="duel-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnComputeWinner" class="success">Compute Winner</button>
+      </div>
+      <div id="winnerStatus" class="status"></div>
+      <pre id="winnerHandleOutput" style="display:none;"></pre>
+    </section>
+
+    <!-- 4. MAKE PUBLIC & DECRYPT -->
+    <section class="card">
+      <h2>4. Make Public & Decrypt Winner</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Make the winner code publicly decryptable and decrypt it via Zama Relayer.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Duel Key</label>
+          <input id="decryptDuelKey" type="text" placeholder="duel-1" value="duel-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnGetHandle" class="secondary">Get Winner Handle</button>
+        <button id="btnMakePublic">Make Winner Public</button>
+        <button id="btnDecryptWinner" class="success">Decrypt Winner</button>
+      </div>
+
+      <div id="decryptStatus" class="status"></div>
+      <pre id="handleOutput" style="display:none;"></pre>
+      <div id="winnerResult" class="result-box"></div>
+    </section>
+
+    <footer>
+      Zama FHEVM · Encrypted Math Duel · Relayer SDK 0.3.0 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+</body>
+</html>

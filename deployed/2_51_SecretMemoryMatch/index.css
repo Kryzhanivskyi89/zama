@@ -1,0 +1,215 @@
+:root {
+    --bg: #06070a;
+    --panel: rgba(255,255,255,0.03);
+    --panel-border: rgba(0, 255, 200, 0.25);
+    --text: #e6faff;
+    --subtle: #8fa3ad;
+
+    --neon1: #00f5ff;
+    --neon2: #00ffa7;
+    --danger: #ff3b6b;
+    --success: #00ffbf;
+
+    --radius: 14px;
+    
+  }
+
+
+/* :root {
+  --bg: #ffffff;
+
+  --panel: rgba(0,0,0,0.03);
+  --panel-border: rgba(0,170,150,0.25);
+
+  --text: #0d1b1e;
+  --subtle: #5b6c72;
+
+  --neon1: #00b9d9;
+  --neon2: #00c78a;
+
+  --danger: #ff3b6b;
+  --success: #00c77a;
+
+  --radius: 14px;
+} */
+
+  * {
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 40px;
+    color: var(--text);
+    background:
+      linear-gradient(135deg, rgba(0,255,255,0.04) 0%, transparent 40%),
+      linear-gradient(-135deg, rgba(0,255,163,0.05) 0%, transparent 40%),
+      var(--bg);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0,255,255,0.15);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--neon1);
+    text-shadow: 0 0 6px var(--neon1);
+  }
+
+  h2 {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    color: var(--neon2);
+    text-shadow: 0 0 6px var(--neon2);
+  }
+
+  /* card panels */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    padding: 26px 30px;
+    border-radius: var(--radius);
+    box-shadow:
+      0 0 12px rgba(0,255,255,0.05),
+      inset 0 0 20px rgba(0,255,200,0.05);
+    transition: 0.25s ease;
+  }
+  .card:hover {
+    box-shadow:
+      0 0 18px rgba(0,255,255,0.08),
+      inset 0 0 25px rgba(0,255,200,0.06);
+  }
+
+  label {
+    display: block;
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--subtle);
+    letter-spacing: 0.5px;
+  }
+
+  input, select {
+    width: 100%;
+    margin-top: 6px;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.25);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--neon1);
+    box-shadow: 0 0 8px var(--neon1);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .col {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  /* neon buttons */
+  .btn {
+    border: none;
+    padding: 12px 22px;
+    border-radius: var(--radius);
+    color: #001;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--neon1);
+    box-shadow: 0 0 12px var(--neon1);
+    transition: 0.2s ease;
+  }
+  .btn:hover {
+    filter: brightness(1.25);
+    transform: translateY(-2px);
+  }
+  .btn-secondary {
+    background: var(--neon2);
+    box-shadow: 0 0 12px var(--neon2);
+  }
+  .btn-success {
+    background: var(--success);
+    box-shadow: 0 0 12px var(--success);
+  }
+
+  .status {
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 13px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(6px);
+  }
+  .status.pending {
+    color: var(--neon1);
+    border-color: var(--neon1);
+  }
+  .status.success {
+    color: var(--success);
+    border-color: var(--success);
+  }
+  .status.error {
+    color: var(--danger);
+    border-color: var(--danger);
+  }
+
+  pre {
+    background: rgba(0,0,0,0.4);
+    border: 1px dashed rgba(0,255,255,0.3);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 14px;
+    max-height: 260px;
+    overflow: auto;
+    font-size: 12px;
+  }
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--subtle);
+  }
+
+  /* match result */
+  .match-result {
+    padding: 16px;
+    margin-top: 16px;
+    border-left: 4px solid var(--success);
+    background: rgba(0,255,191,0.08);
+    border-radius: 10px;
+  }
+  .match-result.no-match {
+    border-left-color: var(--danger);
+    background: rgba(255, 0, 91, 0.08);
+  }

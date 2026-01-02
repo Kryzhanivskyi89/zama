@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Private Race Time — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+  
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏁 Private Race Time</h1>
+      <button id="btnConnect">Connect Wallet</button>
+    </header>
+
+    <!-- 1. SUBMIT TIME -->
+    <section class="card">
+      <h2>1. Submit Encrypted Race Time</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Encrypt your race time (seconds) and submit it under a runner key. Contract keeps your best time encrypted.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Runner Key (any string, e.g. "runner-1")</label>
+          <input id="runnerKey" type="text" placeholder="runner-1" value="runner-1" />
+        </div>
+        <div class="col">
+          <label>Race Time (seconds)</label>
+          <input id="raceTime" type="number" min="0" max="100000" value="123" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnSubmitTime" class="success">Submit Encrypted Time</button>
+      </div>
+      <div id="timeStatus" class="status"></div>
+      <pre id="timeLog" style="display:none;"></pre>
+    </section>
+
+    <!-- 2. COMPUTE PERSONAL BEST FLAG -->
+    <section class="card">
+      <h2>2. Compute Personal Best Flag</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Contract compares your encrypted time with your encrypted best time and stores an encrypted flag (1 = personal best, 0 = not).
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Runner Key</label>
+          <input id="flagRunnerKey" type="text" placeholder="runner-1" value="runner-1" />
+        </div>
+        <div class="col">
+          <label>Race Time Again (same value as submitted)</label>
+          <input id="flagRaceTime" type="number" min="0" max="100000" value="123" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnComputeFlag" class="success">Compute Encrypted Flag</button>
+      </div>
+      <div id="flagStatus" class="status"></div>
+      <pre id="flagHandleOutput" style="display:none;"></pre>
+    </section>
+
+    <!-- 3. MAKE PUBLIC & DECRYPT FLAG -->
+    <section class="card">
+      <h2>3. Make Flag Public & Decrypt</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Make your personal-best flag publicly decryptable and reveal only the boolean result, not the raw times.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Runner Key</label>
+          <input id="decryptRunnerKey" type="text" placeholder="runner-1" value="runner-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnGetFlagHandle" class="secondary">Get Flag Handle</button>
+        <button id="btnMakeFlagPublic">Make Flag Public</button>
+        <button id="btnDecryptFlag" class="success">Decrypt Flag</button>
+      </div>
+
+      <div id="decryptStatus" class="status"></div>
+      <pre id="handleOutput" style="display:none;"></pre>
+      <div id="flagResult" class="result-box"></div>
+    </section>
+
+    <footer>
+      Zama FHEVM · Private Race Time · Relayer SDK 0.3.0 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+  
+</body>
+</html>

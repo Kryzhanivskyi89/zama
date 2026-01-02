@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Private Coin Flipper vs House — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+  
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1><strong>Private Coin Flipper</strong> <span>VS HOUSE</span></h1>
+        <p>Biased on-chain coin, encrypted choices and verifiable wins — flip privately, prove publicly.</p>
+      </div>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- HOUSE: SET BIAS -->
+    <section class="card">
+      <h2>1️⃣ House: Set Encrypted Bias</h2>
+      <p>
+        The house encrypts its biased side of the coin (0 = heads, 1 = tails). Players never see it.
+      </p>
+
+      <label>House bias (0 = heads, 1 = tails)</label>
+      <input id="biasInput" type="number" min="0" max="1" value="0"/>
+
+      <div class="row">
+        <button id="btnSetBias" class="btn btn-secondary">Set House Bias</button>
+        <div id="biasStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER: PLAY FLIP -->
+    <section class="card">
+      <h2>2️⃣ Player: Encrypted Flip</h2>
+      <p>
+        Choose heads or tails (privately), encrypt your choice, and play against the house.
+      </p>
+
+      <label>Your choice</label>
+      <select id="choiceInput">
+        <option value="0">0 — Heads</option>
+        <option value="1">1 — Tails</option>
+      </select>
+
+      <div class="row">
+        <button id="btnPlayFlip" class="btn btn-success">Play Encrypted Flip</button>
+        <div id="flipStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="resultHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT LAST RESULT -->
+    <section class="card">
+      <h2>3️⃣ Decrypt Last Flip Result</h2>
+      <p>
+        Make your last flip result public and decrypt it via Relayer.
+      </p>
+
+      <div class="row">
+        <button id="btnGetResultHandle" class="btn btn-secondary">Get My Result Handle</button>
+        <button id="btnMakeResultPublic" class="btn">Make My Result Public</button>
+        <button id="btnDecryptResult" class="btn btn-success">Decrypt Result</button>
+      </div>
+
+      <div id="decryptResultStatus" class="status" style="display:none;"></div>
+      <div id="flipResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <!-- DECRYPT TOTAL WINS -->
+    <section class="card">
+      <h2>4️⃣ Decrypt Total Wins vs House</h2>
+      <p>
+        Optionally, reveal your total number of encrypted wins against the house.
+      </p>
+
+      <div class="row">
+        <button id="btnGetWinsHandle" class="btn btn-secondary">Get Wins Handle</button>
+        <button id="btnMakeWinsPublic" class="btn">Make My Wins Public</button>
+        <button id="btnDecryptWins" class="btn btn-success">Decrypt Wins</button>
+      </div>
+
+      <pre id="winsHandleOutput" style="display:none;">—</pre>
+      <div id="winsStatus" class="status" style="display:none;"></div>
+      <div id="winsResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>
+      Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+ 
+</body>
+</html>

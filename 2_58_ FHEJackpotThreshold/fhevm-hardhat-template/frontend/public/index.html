@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FHE Jackpot Threshold — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+ 
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🎰 FHE Jackpot Threshold</h1>
+        <small>Private jackpot logic on-chain</small>
+      </div>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- ADMIN: SET THRESHOLD -->
+    <section class="card">
+      <h2>1️⃣ Set Encrypted Jackpot Threshold</h2>
+      <p style="color:var(--muted);font-size:13px;">
+        Encrypt the jackpot threshold (total deposits / points). Players only see “ready / not yet”.
+      </p>
+
+      <label>Jackpot threshold (uint16)</label>
+      <input id="thresholdInput" type="number" min="0" max="65535" value="1000"/>
+
+      <div class="row">
+        <button id="btnSetThreshold" class="btn btn-secondary">Set Jackpot Threshold</button>
+        <div id="thresholdStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER: CHECK PROGRESS -->
+    <section class="card">
+      <h2>2️⃣ Submit Encrypted Total & Check</h2>
+      <p style="color:var(--muted);font-size:13px;">
+        Encrypt your total deposits / points and let the contract check if the jackpot is ready.
+      </p>
+
+      <label>Your total (uint16)</label>
+      <input id="amountInput" type="number" min="0" max="65535" value="750"/>
+
+      <div class="row">
+        <button id="btnCheckProgress" class="btn btn-success">Check Jackpot Progress</button>
+        <div id="progressStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="flagHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT FLAG -->
+    <section class="card">
+      <h2>3️⃣ Make Public & Decrypt Jackpot Flag</h2>
+      <p style="color:var(--muted);font-size:13px;">
+        Make your last jackpot flag public and decrypt it via Relayer.
+      </p>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get My Flag Handle</button>
+        <button id="btnMakePublic" class="btn">Make My Flag Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Flag</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="flagResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>
+      Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+ 
+</body>
+</html>

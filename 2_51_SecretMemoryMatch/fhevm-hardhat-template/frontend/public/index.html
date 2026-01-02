@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Secret Memory Match — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧠 Secret Memory Match</h1>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- ADMIN: SET CARDS -->
+    <section class="card">
+      <h2>1️⃣ Admin: Set Encrypted Cards</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Encrypt and set values for card #1 and card #2. Values are hidden on-chain (euint16).
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Card #1 value (uint16)</label>
+          <input id="card1Value" type="number" min="0" max="65535" value="42"/>
+        </div>
+        <div class="col">
+          <label>Card #2 value (uint16)</label>
+          <input id="card2Value" type="number" min="0" max="65535" value="42"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnSetCard1" class="btn btn-secondary">Set Card #1</button>
+        <button id="btnSetCard2" class="btn btn-secondary">Set Card #2</button>
+        <div id="setStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER GUESS -->
+    <section class="card">
+      <h2>2️⃣ Player: Encrypted Guess</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Encrypt your guesses for the two card positions (must be 1 or 2). Contract will check if the hidden card values match.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>First card index (1 or 2)</label>
+          <input id="guess1" type="number" min="1" max="2" value="1"/>
+        </div>
+        <div class="col">
+          <label>Second card index (1 or 2)</label>
+          <input id="guess2" type="number" min="1" max="2" value="2"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnGuess" class="btn btn-success">Submit Guess (Homomorphic)</button>
+        <div id="guessStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="matchHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT RESULT -->
+    <section class="card">
+      <h2>3️⃣ Make Public & Decrypt Result</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Make your last match result publicly decryptable and reveal if the cards matched.
+      </p>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get My Match Handle</button>
+        <button id="btnMakePublic" class="btn">Make My Match Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Match Result</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="matchResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6</footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+  <script type="module">
+   </script>
+</body>
+</html>

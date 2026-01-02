@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Secret Karaoke Score — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css"/>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎤 Secret Karaoke Score</h1>
+      <button id="btnConnect">Connect Wallet</button>
+    </header>
+
+    <!-- 1. SUBMIT SCORE -->
+    <section class="card">
+      <h2>1. Submit Secret Score</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Client computes a local karaoke score, encrypts it, and submits it under a user key.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>User Key (any string, e.g. "user-1")</label>
+          <input id="userKey" type="text" placeholder="user-1" value="user-1" />
+        </div>
+        <div class="col">
+          <label>Karaoke Score (0–1000)</label>
+          <input id="userScore" type="number" min="0" max="1000" value="650" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnSubmitScore" class="success">Submit Secret Score</button>
+      </div>
+      <div id="scoreStatus" class="status"></div>
+      <pre id="scoreLog" style="display:none;"></pre>
+    </section>
+
+    <!-- 2. COMPUTE LEVEL -->
+    <section class="card">
+      <h2>2. Compute Karaoke Level</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Contract compares your encrypted score against Bronze/Silver/Gold thresholds and stores an encrypted level.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>User Key (same as above)</label>
+          <input id="levelUserKey" type="text" placeholder="user-1" value="user-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnComputeLevel" class="success">Compute Encrypted Level</button>
+      </div>
+      <div id="levelStatus" class="status"></div>
+      <pre id="levelHandleOutput" style="display:none;"></pre>
+    </section>
+
+    <!-- 3. MAKE PUBLIC & DECRYPT -->
+    <section class="card">
+      <h2>3. Make Public & Decrypt Level</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Make your level publicly decryptable and reveal only the tier, not the raw score.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>User Key</label>
+          <input id="decryptUserKey" type="text" placeholder="user-1" value="user-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnGetLevelHandle" class="secondary">Get Level Handle</button>
+        <button id="btnMakeLevelPublic">Make Level Public</button>
+        <button id="btnDecryptLevel" class="success">Decrypt Level</button>
+      </div>
+
+      <div id="decryptStatus" class="status"></div>
+      <pre id="handleOutput" style="display:none;"></pre>
+      <div id="levelResult" class="result-box"></div>
+    </section>
+
+    <footer>
+      Zama FHEVM · Secret Karaoke Score · Relayer SDK 0.3.0 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+</body>
+</html>

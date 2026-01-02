@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Encrypted Certification Filter — Zama FHEVM</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    header h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00d9ff, #0099ff, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      text-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+    }
+
+    header p {
+      font-size: 1rem;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    #btnConnect {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #00d9ff, #0099ff);
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+    }
+
+    #btnConnect:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    .card:hover {
+      border-color: rgba(0, 217, 255, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 217, 255, 0.2);
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #00d9ff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card h2::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #00d9ff, #0099ff);
+      border-radius: 2px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #cbd5e0;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      background: rgba(51, 65, 85, 0.5);
+      color: #e2e8f0;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #00d9ff;
+      background: rgba(51, 65, 85, 0.8);
+      box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+    }
+
+    input::placeholder {
+      color: #64748b;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 11px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #00d9ff, #0099ff);
+      color: #000;
+      flex: 1;
+      min-width: 120px;
+      box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+    }
+
+    .btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.5);
+    }
+
+    .btn.secondary {
+      background: rgba(0, 217, 255, 0.15);
+      color: #00d9ff;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .btn.secondary:hover {
+      background: rgba(0, 217, 255, 0.25);
+      border-color: rgba(0, 217, 255, 0.6);
+    }
+
+    .status {
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border-left: 3px solid #22c55e;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border-left: 3px solid #ef4444;
+    }
+
+    .debug-log {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 0.75rem;
+      font-family: 'Courier New', monospace;
+      max-height: 250px;
+      overflow-y: auto;
+      color: #00d9ff;
+      line-height: 1.6;
+    }
+
+    .debug-log::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .debug-log::-webkit-scrollbar-track {
+      background: rgba(0, 217, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    .debug-log::-webkit-scrollbar-thumb {
+      background: rgba(0, 217, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .debug-log::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 217, 255, 0.5);
+    }
+
+    pre {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      overflow: auto;
+      max-height: 200px;
+      font-size: 0.8rem;
+      font-family: 'Courier New', monospace;
+      color: #00d9ff;
+      margin-top: 12px;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: rgba(0, 217, 255, 0.1);
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(0, 217, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+      animation: fadeIn 1s ease-out 0.3s backwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.5rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .row {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔐 Encrypted Certification</h1>
+      <p>Zama FHEVM Dapp</p>
+      <button id="btnConnect" class="btn primary">Connect Wallet</button>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Initialize</h2>
+        <label>Certificate ID</label>
+        <div class="row">
+          <input id="inpCertId" type="number" min="1" value="1" style="flex: 1; margin-bottom: 0;"/>
+          <button id="btnGenerate" class="btn secondary" style="flex: 0.8;">Random</button>
+        </div>
+        <div class="row">
+          <button id="btnInit" class="btn primary">Initialize</button>
+        </div>
+        <div id="statusInit" class="status"></div>
+      </section>
+
+      <section class="card">
+        <h2>Submit</h2>
+        <label>Certificate ID</label>
+        <input id="inpCertId2" type="number" min="1" value="1"/>
+        <label>Qualification Level</label>
+        <input id="inpLevel" type="number" min="0" max="65535" value="100"/>
+        <div class="row">
+          <button id="btnSubmit" class="btn primary">Encrypt & Submit</button>
+        </div>
+        <div id="statusSubmit" class="status"></div>
+        <div class="debug-log" id="debugLog"></div>
+      </section>
+
+      <section class="card">
+        <h2>View</h2>
+        <label>Certificate ID</label>
+        <input id="inpCertId3" type="number" min="1" value="1"/>
+        <div class="row">
+          <button id="btnSubmissions" class="btn primary">Get Submissions</button>
+        </div>
+        <pre id="output">—</pre>
+      </section>
+    </div>
+
+    <footer>
+      Built with ❤️ using Zama FHEVM • Relayer SDK 0.3.0 • Ethers v6
+    </footer>
+  </div>
+
+  <script type="module">
+    import { initSDK, createInstance, SepoliaConfig } from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+    import { BrowserProvider, Contract, getAddress } from "https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm";
+
+    const CONFIG = {
+      RELAYER_URL: "https://relayer.testnet.zama.org",
+      GATEWAY_URL: "https://gateway.testnet.zama.org",
+      CONTRACT_ADDRESS: "0x5b30beD0BA9D796f1e58FA36130e513E3EBEEEe7"
+    };
+
+    const ABI = [
+      "function initCertificate(bytes32 certId) public",
+      "function submitCertificate(bytes32 certId, bytes encryptedData) external",
+      "function submissions(bytes32 certId) external view returns (uint256)"
+    ];
+
+    let provider, signer, address, contract, relayer;
+    const $ = s => document.querySelector(s);
+    
+    const toBytes = (u8) => u8 instanceof Uint8Array ? u8 : new Uint8Array(Object.values(u8));
+    const concatBytes = (...arrs) => {
+      const total = arrs.reduce((sum, arr) => sum + arr.length, 0);
+      const result = new Uint8Array(total);
+      let offset = 0;
+      for (const arr of arrs) {
+        result.set(arr, offset);
+        offset += arr.length;
+      }
+      return result;
+    };
+    
+    const log = (msg, data = null) => {
+      const el = $("#debugLog");
+      const line = `${msg} ${data ? JSON.stringify(data).substring(0, 150) : ''}`;
+      console.log(line);
+      el.innerHTML += line + '<br/>';
+      el.scrollTop = el.scrollHeight;
+    };
+    
+    const numberToBytes32 = (num) => '0x' + num.toString().padStart(64, '0');
+    
+    const setStatus = (id, msg, success = false) => {
+      const el = $(id);
+      el.textContent = msg;
+      el.className = `status ${success ? 'success' : 'error'}`;
+    };
+
+    const generateRandomCertId = () => Math.floor(Math.random() * 1000000000) + 1;
+
+    async function connect() {
+      if (!window.ethereum) {
+        alert("MetaMask not installed");
+        return false;
+      }
+      try {
+        provider = new BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = await provider.getSigner();
+        address = await signer.getAddress();
+        contract = new Contract(getAddress(CONFIG.CONTRACT_ADDRESS), ABI, signer);
+        $("#btnConnect").textContent = address.slice(0,6)+"…"+address.slice(-4);
+        
+        if (!relayer) {
+          await initSDK();
+          relayer = await createInstance({
+            ...SepoliaConfig,
+            relayerUrl: CONFIG.RELAYER_URL,
+            gatewayUrl: CONFIG.GATEWAY_URL,
+            network: window.ethereum
+          });
+          log("✅ Relayer ready");
+        }
+        return true;
+      } catch (e) {
+        log("❌ Error:", e.message);
+        return false;
+      }
+    }
+
+    $("#btnConnect").onclick = connect;
+    $("#btnGenerate").onclick = () => {
+      const id = generateRandomCertId();
+      $("#inpCertId").value = id;
+      $("#inpCertId2").value = id;
+      $("#inpCertId3").value = id;
+    };
+
+    $("#btnInit").onclick = async () => {
+      try {
+        if (!await connect()) return;
+        const certNum = parseInt($("#inpCertId").value);
+        if (isNaN(certNum) || certNum < 1) throw new Error("Invalid ID");
+        
+        const certId = numberToBytes32(certNum);
+        setStatus("#statusInit", "Sending…");
+        const tx = await contract.initCertificate(certId);
+        await tx.wait();
+        setStatus("#statusInit", "✅ Initialized", true);
+        log("✅ Init success");
+      } catch (e) {
+        setStatus("#statusInit", "❌ " + (e.reason || e.message));
+        log("❌ Init failed:", e.message);
+      }
+    };
+
+    $("#btnSubmit").onclick = async () => {
+      try {
+        if (!await connect()) return;
+        
+        const certNum = parseInt($("#inpCertId2").value);
+        const level = parseInt($("#inpLevel").value);
+        if (isNaN(certNum) || isNaN(level)) throw new Error("Invalid input");
+        
+        const certId = numberToBytes32(certNum);
+        
+        setStatus("#statusSubmit", "Encrypting…");
+        log("🔐 Encrypting...");
+
+        const input = relayer.createEncryptedInput(CONFIG.CONTRACT_ADDRESS, address);
+        input.add16(BigInt(level));
+        const { handles, inputProof } = await input.encrypt();
+        
+        log("✅ Encrypted, combining data...");
+        
+        // Convert to Uint8Array if needed
+        const handle = toBytes(handles[0]);
+        const proof = toBytes(inputProof);
+        
+        // Concatenate: handle (32 bytes) + proof (rest)
+        const combined = concatBytes(handle, proof);
+        
+        log("📦 Data ready", { handleLen: handle.length, proofLen: proof.length, totalLen: combined.length });
+        
+        setStatus("#statusSubmit", "Sending tx…");
+        const tx = await contract.submitCertificate(certId, combined);
+        
+        log("⏳ Waiting:", tx.hash);
+        await tx.wait();
+        
+        setStatus("#statusSubmit", "✅ Submitted!", true);
+        log("✅ TX SUCCESS");
+      } catch (e) {
+        setStatus("#statusSubmit", "❌ " + (e.reason || e.message));
+        log("❌ Error:", e.message.substring(0, 100));
+      }
+    };
+
+    $("#btnSubmissions").onclick = async () => {
+      try {
+        if (!await connect()) return;
+        const certNum = parseInt($("#inpCertId3").value);
+        if (isNaN(certNum)) throw new Error("Invalid ID");
+        
+        const certId = numberToBytes32(certNum);
+        const count = await contract.submissions(certId);
+        $("#output").textContent = "Submissions: " + count.toString();
+      } catch (e) {
+        $("#output").textContent = "❌ " + (e.reason || e.message);
+      }
+    };
+
+  </script>
+</body>
+</html>

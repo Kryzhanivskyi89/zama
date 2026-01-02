@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Anonymous Review Analytics — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+
+</head>
+<body>
+  <div class="container">
+    <header>
+    <div>
+      <h1>🔒 Anonymous Review Analytics</h1>
+      <p>Encrypted, anonymized code review ratings — only aggregated levels are visible.</p>
+
+      <div class="header-chips">
+        <span class="chip chip-encrypted">FHE Encrypted</span>
+        <span class="chip chip-onchain">On‑chain Aggregates</span>
+        <span class="chip chip-levels">Levels: 0 · 1 · 2</span>
+      </div>
+    </div>
+    <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+  <!-- TWO-COLUMN LAYOUT -->
+  <div class="layout-grid">
+    
+    <!-- LEFT: MAIN FLOWS -->
+    <div class="main-column">
+
+      <!-- SUBMIT RATING -->
+      <section class="card">
+        <h2>1️⃣ Submit Encrypted Rating</h2>
+        <p>Reviewers submit 1–5 scores for a review, linked only via hashed IDs — never by address.</p>
+
+        <div class="row">
+          <div class="col">
+            <label>Review ID (string, e.g. "PR-123")</label>
+            <input id="reviewIdInput" type="text" value="PR-123"/>
+          </div>
+          <div class="col">
+            <label>Reviewer Tag (string, e.g. "alice")</label>
+            <input id="reviewerTagInput" type="text" value="alice"/>
+          </div>
+          <div class="col">
+            <label>Rating (1–5)</label>
+            <input id="ratingInput" type="number" min="1" max="5" value="5"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="btnSubmitRating" class="btn btn-success">Submit Encrypted Rating</button>
+          <div id="submitStatus" class="status" style="display:none;"></div>
+        </div>
+      </section>
+
+      <!-- REVIEW LEVEL -->
+      <section class="card">
+        <h2>2️⃣ Review-Level Feedback</h2>
+        <p>Compute and decrypt an anonymous level (0 = excellent, 1 = ok, 2 = needs attention) for a specific review.</p>
+
+        <div class="row">
+          <div class="col">
+            <label>Review ID (string)</label>
+            <input id="reviewLevelIdInput" type="text" value="PR-123"/>
+          </div>
+          <div class="col">
+            <label>High threshold (sum)</label>
+            <input id="reviewHighInput" type="number" min="0" max="65535" value="20"/>
+          </div>
+          <div class="col">
+            <label>Mid threshold (sum)</label>
+            <input id="reviewMidInput" type="number" min="0" max="65535" value="10"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="btnComputeReviewLevel" class="btn btn-secondary">Compute Review Level</button>
+          <button id="btnMakeReviewLevelPublic" class="btn">Make Review Level Public</button>
+          <button id="btnDecryptReviewLevel" class="btn btn-success">Decrypt Review Level</button>
+          <div id="reviewLevelStatus" class="status" style="display:none;"></div>
+        </div>
+
+        <pre id="reviewLevelHandleOutput" style="display:none;">—</pre>
+        <div id="reviewLevelResult" class="match-result" style="display:none;"></div>
+      </section>
+
+      <!-- TAG LEVEL -->
+      <section class="card">
+        <h2>3️⃣ Reviewer Tag-Level Feedback</h2>
+        <p>Compute anonymous level for all ratings associated with a given reviewer tag (e.g. "alice").</p>
+
+        <div class="row">
+          <div class="col">
+            <label>Reviewer Tag (string)</label>
+            <input id="tagLevelInput" type="text" value="alice"/>
+          </div>
+          <div class="col">
+            <label>High threshold (sum)</label>
+            <input id="tagHighInput" type="number" min="0" max="65535" value="50"/>
+          </div>
+          <div class="col">
+            <label>Mid threshold (sum)</label>
+            <input id="tagMidInput" type="number" min="0" max="65535" value="25"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="btnComputeTagLevel" class="btn btn-secondary">Compute Tag Level</button>
+          <button id="btnMakeTagLevelPublic" class="btn">Make Tag Level Public</button>
+          <button id="btnDecryptTagLevel" class="btn btn-success">Decrypt Tag Level</button>
+          <div id="tagLevelStatus" class="status" style="display:none;"></div>
+        </div>
+
+        <pre id="tagLevelHandleOutput" style="display:none;">—</pre>
+        <div id="tagLevelResult" class="match-result" style="display:none;"></div>
+      </section>
+
+      <!-- TEAM LEVEL -->
+      <section class="card">
+        <h2>4️⃣ Team-Level Health</h2>
+        <p>Global encrypted team health level from all submitted ratings.</p>
+
+        <div class="row">
+          <div class="col">
+            <label>High threshold (sum)</label>
+            <input id="teamHighInput" type="number" min="0" max="65535" value="200"/>
+          </div>
+          <div class="col">
+            <label>Mid threshold (sum)</label>
+            <input id="teamMidInput" type="number" min="0" max="65535" value="100"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="btnComputeTeamLevel" class="btn btn-secondary">Compute Team Level</button>
+          <button id="btnMakeTeamLevelPublic" class="btn">Make Team Level Public</button>
+          <button id="btnDecryptTeamLevel" class="btn btn-success">Decrypt Team Level</button>
+          <div id="teamLevelStatus" class="status" style="display:none;"></div>
+        </div>
+
+        <pre id="teamLevelHandleOutput" style="display:none;">—</pre>
+        <div id="teamLevelResult" class="match-result" style="display:none;"></div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT: SUMMARY + HISTORY + ACTIVITY -->
+    <div class="side-column">
+
+      <!-- SUMMARY CARD -->
+      <section class="card summary-card">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-label">Total ratings (session)</div>
+            <div class="summary-value" id="summaryTotalRatings">0</div>
+            <div class="summary-sub">Encrypted submissions from this browser.</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Last review level</div>
+            <div class="summary-value summary-pill" id="summaryLastReviewLevel">—</div>
+            <div class="summary-sub">Latest decrypted level for any review.</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Last tag level</div>
+            <div class="summary-value summary-pill" id="summaryLastTagLevel">—</div>
+            <div class="summary-sub">Latest decrypted level for a reviewer tag.</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Team health</div>
+            <div class="summary-value summary-pill" id="summaryTeamLevel">—</div>
+            <div class="summary-sub">Global encrypted health indicator.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTORY “CHART” -->
+      <section class="card history-card">
+        <div class="history-header">
+          <h2>📊 Live Levels Timeline</h2>
+          <p>Each time you decrypt a level, it is added here. No raw scores ever leave your browser.</p>
+        </div>
+
+        <div class="history-content">
+          <div class="history-legend">
+            <span class="legend-dot legend-dot-0"></span><span>Excellent (0)</span>
+            <span class="legend-dot legend-dot-1"></span><span>OK (1)</span>
+            <span class="legend-dot legend-dot-2"></span><span>Needs attention (2)</span>
+          </div>
+
+          <div class="history-table">
+            <div class="history-header-row">
+              <span>Type</span>
+              <span>ID / Tag</span>
+              <span>Level</span>
+              <span>When</span>
+            </div>
+            <div id="historyBody" class="history-body">
+              <!-- JS will inject rows -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY LOG -->
+      <section class="card activity-card">
+        <div class="activity-header">
+          <h2>🧾 Activity</h2>
+          <p>Key actions this session: connects, encrypted submissions, level decrypts.</p>
+        </div>
+        <div id="activityLog" class="activity-body">
+          <!-- JS will inject entries -->
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+    <footer>
+      <div class="footer-container">
+        <div class="footer-content">
+          <!-- SOCIAL SECTION -->
+          <div class="footer-section">
+            <p class="footer-section-title">My social profiles:</p>
+            <div class="social-links">
+              <a 
+                href="http://www.linkedin.com/in/andrii-kryzhanivskyi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link"
+                title="LinkedIn"
+                aria-label="LinkedIn Profile"
+              >
+                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" color="white">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </a>
+              <a 
+                href="https://github.com/Kryzhanivskyi89"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link"
+                title="GitHub"
+                aria-label="GitHub Profile"
+              >
+                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" color="white">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+              </a>
+              <a 
+                href="https://t.me/andrew_506"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-link"
+                title="Telegram"
+                aria-label="Telegram Profile"
+              >
+                <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" color="white">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295-.037 0-.074 0-.11-.01l.214-3.053 5.56-5.023c.242-.213-.054-.336-.375-.123l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.136-.954l11.566-4.458c.54-.197 1.011.131.844 1.955z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- CONTACTS SECTION -->
+          <div class="footer-section">
+            <p class="footer-section-title">Contact with me:</p>
+            <div class="contact-links">
+              <a 
+                href="mailto:kryzhanivskyi.an@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                class="contact-link"
+                title="Send email"
+              >
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="white">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <span class="contact-text">kryzhanivskyi.an@gmail.com</span>
+              </a>
+              <a 
+                href="tel:+380990783060"
+                class="contact-link"
+                title="Call phone"
+              >
+                <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="white">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <span class="contact-text">+380990783060</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- BRAND SECTION -->
+        <div class="footer-brand">
+          <p class="brand-text">Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0 · Ethers v6</p>
+          <p class="brand-text">Developed by:
+            <a target="_blank" class="brand-text" href="https://kryzhanivskyi89.github.io/portfolio/">&lt;AndrewDev/&gt;</a>
+          </p>
+          <p class="copyright">© 2025 All rights reserved</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="./index.js">  </script>
+</body>
+</html>

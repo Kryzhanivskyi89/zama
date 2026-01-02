@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Blind Target Range — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+ 
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 Blind Target Range</h1>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- SUBMIT INTERVAL -->
+    <section class="card">
+      <h2>1️⃣ Submit Secret Interval</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Register a hidden X-range [L, R] (encrypted on-chain).
+      </p>
+
+      <label>Left bound L (uint16)</label>
+      <input id="leftBound" type="number" min="0" max="65535" value="40"/>
+
+      <label>Right bound R (uint16)</label>
+      <input id="rightBound" type="number" min="0" max="65535" value="60"/>
+
+      <div class="row">
+        <button id="btnSubmitInterval" class="btn">Register Interval</button>
+        <div id="intervalStatus" class="status" style="display:none;"></div>
+      </div>
+      <div id="intervalInfo" class="info-grid" style="display:none;">
+        <div class="info-item">
+          <div class="info-label">Interval ID</div>
+          <div class="info-value" id="intervalIdDisplay">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Your Address</div>
+          <div class="info-value" id="intervalAddressDisplay" style="font-size:12px;">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBMIT SHOT -->
+    <section class="card">
+      <h2>2️⃣ Submit Encrypted Shot</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Register a hidden shot coordinate X.
+      </p>
+
+      <label>Shot X (uint16)</label>
+      <input id="shotX" type="number" min="0" max="65535" value="50"/>
+
+      <div class="row">
+        <button id="btnSubmitShot" class="btn btn-secondary">Register Shot</button>
+        <div id="shotStatus" class="status" style="display:none;"></div>
+      </div>
+      <div id="shotInfo" class="info-grid" style="display:none;">
+        <div class="info-item">
+          <div class="info-label">Shot ID</div>
+          <div class="info-value" id="shotIdDisplay">—</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Shooter Address</div>
+          <div class="info-value" id="shotAddressDisplay" style="font-size:12px;">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPUTE HIT -->
+    <section class="card">
+      <h2>🔍 3️⃣ Compute Hit Zone</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Compute homomorphic hit level (0=far, 1=near, 2=center) using encrypted thresholds.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Interval ID</label>
+          <input id="hitIntervalId" type="number" min="1" value="1"/>
+        </div>
+        <div class="col">
+          <label>Shot ID</label>
+          <input id="hitShotId" type="number" min="1" value="1"/>
+        </div>
+        <div class="col">
+          <label>Near radius (uint16)</label>
+          <input id="nearRadius" type="number" min="0" max="65535" value="20"/>
+        </div>
+        <div class="col">
+          <label>Center radius (uint16)</label>
+          <input id="centerRadius" type="number" min="0" max="65535" value="5"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnComputeHit" class="btn btn-success">Compute Hit (Homomorphic)</button>
+        <div id="hitStatus" class="status" style="display:none;"></div>
+      </div>
+      <pre id="hitHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT -->
+    <section class="card">
+      <h2>🔓 4️⃣ Retrieve & Decrypt Hit</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Make hit result public and decrypt it via Relayer.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Interval ID</label>
+          <input id="decryptIntervalId" type="number" min="1" value="1"/>
+        </div>
+        <div class="col">
+          <label>Shot ID</label>
+          <input id="decryptShotId" type="number" min="1" value="1"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get Hit Handle</button>
+        <button id="btnMakePublic" class="btn">Make Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Result</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="hitResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6</footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+
+</body>
+</html>

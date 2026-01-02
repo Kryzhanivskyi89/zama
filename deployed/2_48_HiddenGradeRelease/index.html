@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hidden Grade Release — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="header-icon">🎓</div>
+      <div class="header-main">
+        <h1 class="app-title">Hidden Grade Release</h1>
+        <p class="app-subtitle">
+          Encrypted exams with visible final grades. Only A/B/C/F and pass/fail ever leave the vault.
+        </p>
+      </div>
+    </header>
+
+    <div class="flow-shell">
+      <div class="flow-header-row">
+        <div>
+          <div class="flow-title">Grade flow</div>
+          <div class="header-meta">
+            Contract:
+            <code id="contractAddr">0xbc2C6549c6Ac35875Dd5d8F2d106BEaE13fE914f</code>
+          </div>
+        </div>
+        <div class="flow-connect">
+          <button id="btnConnect" class="btn-connect">Connect Wallet</button>
+          <div id="connectStatus" class="status"></div>
+        </div>
+      </div>
+
+      <!-- Горизонтальна лінія кроків -->
+      <div class="steps-track">
+        <div class="step-pill">
+          <div class="step-pill-main">
+            <div class="step-index">1</div>
+            <div class="step-label">Submit scores</div>
+          </div>
+          <div class="step-note">Student sends encrypted Test 1–3.</div>
+        </div>
+        <div class="step-pill">
+          <div class="step-pill-main">
+            <div class="step-index">2</div>
+            <div class="step-label">Make grade public</div>
+          </div>
+          <div class="step-note">Optional reveal of letter &amp; pass flag.</div>
+        </div>
+        <div class="step-pill">
+          <div class="step-pill-main">
+            <div class="step-index">3</div>
+            <div class="step-label">Get &amp; decrypt</div>
+          </div>
+          <div class="step-note">Anyone can read visible grades.</div>
+        </div>
+      </div>
+
+      <!-- Зона з формами -->
+      <div class="forms-grid">
+        <!-- Ліва панель: сабміт -->
+        <div class="panel">
+          <h2 class="panel-title">1. Encrypted scores</h2>
+          <p class="panel-desc">
+            Enter three scores (0–100). They are encrypted client‑side via Relayer with attestation.
+          </p>
+
+          <label>Test 1 (0–100)</label>
+          <input id="score1" type="number" min="0" max="100" value="85" />
+
+          <label>Test 2 (0–100)</label>
+          <input id="score2" type="number" min="0" max="100" value="90" />
+
+          <label>Test 3 (0–100)</label>
+          <input id="score3" type="number" min="0" max="100" value="88" />
+
+          <div class="row">
+            <button id="btnSubmitScores" class="btn">Encrypt &amp; Submit</button>
+          </div>
+          <div id="submitStatus" class="status"></div>
+          <pre id="handlesOut" style="display:none;">—</pre>
+        </div>
+
+        <!-- Права панель: публікація + фетч/дешифр -->
+        <div class="panel">
+          <h2 class="panel-title">2–3. Visibility &amp; lookup</h2>
+          <p class="panel-desc">
+            Choose if your grade can be revealed, then anyone can fetch and decrypt it by address.
+          </p>
+
+          <div style="margin-bottom:8px;">
+            <strong style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em;">
+              Make my grade public
+            </strong>
+            <p style="margin:4px 0 0; font-size:12px; color:var(--text-secondary);">
+              Toggle visibility for the last computed grade &amp; pass flag.
+            </p>
+            <div class="row" style="margin-top:8px;">
+              <button id="btnMakePublic" class="btn">Make My Grade Public</button>
+            </div>
+            <div id="makeStatus" class="status"></div>
+          </div>
+
+          <hr style="border:none; border-top:1px dashed var(--border-soft); margin:10px 0;" />
+
+          <label>Student address to fetch</label>
+          <input id="fetchAddr" type="text" placeholder="0x..." />
+
+          <div class="row" style="margin-top:8px;">
+            <button id="btnGetHandles" class="btn">Get Handles</button>
+            <button id="btnDecrypt" class="btn">Public Decrypt</button>
+          </div>
+
+          <div id="decryptStatus" class="status"></div>
+          <div id="gradeResult" class="result" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Панель результату (можеш оновлювати innerHTML з JS разом із #gradeResult) -->
+      <div class="result-panel">
+        <div>
+          <div class="result-main-label">Latest visible grade</div>
+          <div class="grade-letter-display pass">A</div>
+          <div class="result-extra">
+            Example state: grade A, status Passed. Real values update after decrypt.
+          </div>
+        </div>
+        <div class="result-raw">
+          <div class="result-raw-title">What others see</div>
+          <div>
+            Letter grade (A/B/C/F) and boolean passed flag only. Original test scores stay encrypted inside the FHEVM contract.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Logs printed to console. Local whitepaper:
+      <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+
+</body>
+</html>

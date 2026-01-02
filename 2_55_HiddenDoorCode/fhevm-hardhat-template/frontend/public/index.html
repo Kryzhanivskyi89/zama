@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hidden Door Code — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+  
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🚪 Hidden Door Code</h1>
+        <small>Encrypted keypad · one secret lock</small>
+        <p>Set a private door code on-chain and let players try to crack it using only “correct / higher / lower” hints.</p>
+      </div>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <!-- ADMIN: SET CODE -->
+    <section class="card">
+      <h2>1️⃣ Set Encrypted Door Code</h2>
+      <p>
+        Encrypt a secret door code (1–9999). Players will only learn “correct / higher / lower”.
+      </p>
+
+      <label>Secret code (1–9999)</label>
+      <input id="codeInput" type="number" min="1" max="9999" value="1234"/>
+
+      <div class="row">
+        <button id="btnSetCode" class="btn btn-secondary">Set Secret Code</button>
+        <div id="codeStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PLAYER: GUESS -->
+    <section class="card">
+      <h2> 2️⃣ Submit Encrypted Guess</h2>
+      <p>
+        Encrypt your guess; the contract will homomorphically compare it to the hidden code.
+      </p>
+
+      <label>Your guess (1–9999)</label>
+      <input id="guessInput" type="number" min="1" max="9999" value="1111"/>
+
+      <div class="row">
+        <button id="btnSubmitGuess" class="btn btn-success">Submit Guess</button>
+        <div id="guessStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="resultHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <!-- DECRYPT RESULT -->
+    <section class="card">
+      <h2>3️⃣ Make Public & Decrypt Result</h2>
+      <p>
+        Make your last result public and decrypt it via Relayer.
+      </p>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get My Result Handle</button>
+        <button id="btnMakePublic" class="btn">Make My Result Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Result</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="guessResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>
+      Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+ 
+</body>
+</html>

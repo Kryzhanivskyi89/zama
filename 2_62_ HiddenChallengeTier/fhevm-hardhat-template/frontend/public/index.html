@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hidden Challenge Tier — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧗 Hidden Challenge Tier <span>Console Mode</span></h1>
+
+      <button id="btnConnect">Connect Wallet</button>
+    </header>
+
+    <!-- 1. SUBMIT COMPLETED CHALLENGES -->
+    <section class="card">
+      <h2>1. Submit Completed Challenges</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Encrypt the number of completed challenges and bind it to a player key. The contract keeps only an encrypted value.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Player Key (e.g. "player-1")</label>
+          <input id="playerKey" type="text" placeholder="player-1" value="player-1" />
+        </div>
+        <div class="col">
+          <label>Completed Challenges (0–65535)</label>
+          <input id="completedCount" type="number" min="0" max="65535" value="7" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnSubmitCompleted" class="success">Submit Encrypted Progress</button>
+      </div>
+      <div id="submitStatus" class="status"></div>
+      <pre id="submitLog" style="display:none;"></pre>
+    </section>
+
+    <!-- 2. COMPUTE TIER -->
+    <section class="card">
+      <h2>2. Compute Hidden Tier</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        The contract compares your encrypted count against Rookie / Pro / Legend thresholds and stores an encrypted tier code.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Player Key (must match)</label>
+          <input id="tierPlayerKey" type="text" placeholder="player-1" value="player-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnComputeTier" class="success">Compute Encrypted Tier</button>
+      </div>
+      <div id="tierStatus" class="status"></div>
+      <pre id="tierHandleOutput" style="display:none;"></pre>
+    </section>
+
+    <!-- 3. MAKE PUBLIC & DECRYPT -->
+    <section class="card">
+      <h2>3. Reveal Tier (Public Decrypt)</h2>
+      <p style="font-size:0.85rem;color:#9ca3af;">
+        Make your encrypted tier publicly decryptable and reveal only the level name, never the raw challenge count.
+      </p>
+
+      <div class="row">
+        <div class="col">
+          <label>Player Key</label>
+          <input id="decryptPlayerKey" type="text" placeholder="player-1" value="player-1" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnGetTierHandle" class="secondary">Get Tier Handle</button>
+        <button id="btnMakeTierPublic">Make Tier Public</button>
+        <button id="btnDecryptTier" class="success">Decrypt Tier</button>
+      </div>
+
+      <div id="decryptStatus" class="status"></div>
+      <pre id="handleOutput" style="display:none;"></pre>
+      <div id="tierResult" class="result-box"></div>
+    </section>
+
+    <footer>
+      Zama FHEVM · Hidden Challenge Tier · Relayer SDK 0.3.0 · Ethers v6
+    </footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+  
+</body>
+</html>

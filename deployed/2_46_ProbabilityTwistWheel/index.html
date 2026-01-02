@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Probability Twist Wheel — Zama FHEVM</title>
+  <link rel="stylesheet" href="./index.css" />
+  
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="header-icon">🎡</div>
+      <div class="header-main">
+        <h1 class="app-title">Probability Twist Wheel</h1>
+        <p class="app-subtitle">
+          Stake a secret risk, spin a hidden random, reveal only win / lose and payout tier.
+        </p>
+      </div>
+      <div class="header-pill">Encrypted spin · FHEVM</div>
+    </header>
+
+    <div class="layout">
+      <div>
+        <div class="card card--intro">
+          <div class="card-header-line">
+            <h1>Spin Flow</h1>
+            <span class="card-tag">Session setup</span>
+          </div>
+          <p class="card-desc">
+            Connect your wallet, choose a stake, let the relayer encrypt the random spin,
+            and the contract decides the outcome.
+          </p>
+          <p class="card-meta">
+            Local whitepaper: <code>/mnt/data/fhevm_whitepaper_new.pdf</code>
+          </p>
+          <div style="margin-top:10px;">
+            <button id="btnConnect" class="btn">Connect Wallet</button>
+            <div id="connectStatus" class="status"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">1</span>Submit Encrypted Stake</h2>
+            <span class="card-tag">Player choice</span>
+          </div>
+          <p class="card-desc">
+            Pick how risky your spin is (0–100). Only the encrypted stake reaches the contract.
+          </p>
+
+          <label>Risk stake (0–100)</label>
+          <input id="stakeVal" type="number" min="0" max="100" value="30" />
+
+          <div class="row">
+            <button id="btnSubmitStake" class="btn">Encrypt &amp; Submit Stake</button>
+          </div>
+          <div id="stakeStatus" class="status"></div>
+          <pre id="stakeHandleOut" style="display:none;">—</pre>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">2</span>Generate &amp; Encrypt Random</h2>
+            <span class="card-tag">Relayer spin</span>
+          </div>
+          <p class="card-desc">
+            The front-end draws a random integer (0–99), relayer encrypts it, and you send it to compute outcome.
+          </p>
+
+          <div class="row">
+            <div class="col">
+              <button id="btnGenRand" class="btn">Generate Random &amp; Encrypt</button>
+            </div>
+            <div class="col">
+              <button id="btnComputeOutcome" class="btn">Compute Outcome</button>
+            </div>
+          </div>
+          <div id="randStatus" class="status"></div>
+          <pre id="randHandleOut" style="display:none;">—</pre>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">3</span>Make Outcome Public</h2>
+            <span class="card-tag">Opt‑in reveal</span>
+          </div>
+          <p class="card-desc">
+            Decide when to reveal the outcome code. The exact random and stake stay secret.
+          </p>
+
+          <div class="row">
+            <button id="btnMakePublic" class="btn">Make My Outcome Public</button>
+          </div>
+          <div id="makeStatus" class="status"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header-line">
+            <h2><span class="step">4</span>Get &amp; Decrypt Outcome</h2>
+            <span class="card-tag">Public view</span>
+          </div>
+          <p class="card-desc">
+            Fetch the encrypted outcome for any address that opted in,
+            then run public decrypt to see win / lose and tier.
+          </p>
+
+          <label>Address to fetch outcome for</label>
+          <input id="fetchAddr" type="text" placeholder="0x..." />
+
+          <div class="row" style="margin-top:8px;">
+            <button id="btnGetHandle" class="btn">Get Outcome Handle</button>
+            <button id="btnDecrypt" class="btn">Public Decrypt</button>
+          </div>
+          <div id="decryptStatus" class="status"></div>
+          <div id="outcomeResult" class="result" style="display:none;"></div>
+        </div>
+      </div>
+
+      <aside class="wheel-panel">
+        <h3 class="wheel-title">Wheel snapshot</h3>
+        <p class="wheel-subtitle">
+          Visual intuition: low stake ⇒ safer slice; high stake ⇒ hotter win zones.
+        </p>
+
+        <div class="wheel-wrap">
+          <div class="wheel">
+            <div class="wheel-pointer"></div>
+          </div>
+
+          <div class="risk-meter">
+            <div class="risk-track"></div>
+            <div class="risk-labels">
+              <span>Safe</span>
+              <span>Spicy</span>
+              <span>All‑in</span>
+            </div>
+          </div>
+
+          <div class="outcome-legend">
+            <div class="legend-pill legend-pill--lose">
+              <span class="label">Code 0 · Lose</span>
+              <span class="note">Spin lands outside your risk slice.</span>
+            </div>
+            <div class="legend-pill legend-pill--small">
+              <span class="label">Code 1 · Small</span>
+              <span class="note">Win with smaller payout zone.</span>
+            </div>
+            <div class="legend-pill legend-pill--big">
+              <span class="label">Code 2 · Big</span>
+              <span class="note">High‑tier hit — biggest rewards.</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      All important logs in console. Relayer SDK 0.3.x required.
+    </footer>
+  </div>
+<script type="module" src="./index.js"></script>
+</body>
+</html>
