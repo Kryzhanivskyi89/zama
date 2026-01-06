@@ -1,6 +1,6 @@
 Zama FHEVM dApps Collection
 
-A curated monorepo of ~27 Fully Homomorphic Encryption (FHE)–powered dApps built on top of Zama’s FHEVM. Each mini‑project showcases a different privacy‑preserving on‑chain use case: health metrics, HR bonuses, gaming, rankings, DAO analytics, confidential matching, age‑gating, and more. All logic runs on encrypted data; smart contracts never see plaintext.
+A curated monorepo of 30+ Fully Homomorphic Encryption (FHE)–powered dApps built on top of Zama’s FHEVM. Each mini‑project showcases a different privacy‑preserving on‑chain use case: health metrics, HR bonuses, gaming, rankings, DAO analytics, confidential matching, age‑gating, and more. All logic runs on encrypted data; smart contracts never see plaintext.
 
 All dApps share a common structure:
 

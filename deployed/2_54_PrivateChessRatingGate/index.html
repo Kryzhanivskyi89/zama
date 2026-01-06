@@ -3,46 +3,69 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Encrypted Puzzle Steps — Zama FHEVM</title>
+  <title>Private Chess Rating Gate — Zama FHEVM</title>
 <link rel="stylesheet" href="./index.css" />
- 
-</head>
 
+</head>
 <body>
-  <!-- HTML НЕ ЗМІНЕНО -->
   <div class="container">
     <header>
-      <h1>🧩 Encrypted Puzzle Steps</h1>
+      <h1>♟️ Private Chess Rating Gate</h1>
       <button id="btnConnect" class="btn">Connect Wallet</button>
     </header>
 
+    <!-- SUBMIT RATING -->
     <section class="card">
-      <h2>1️⃣ Submit Encrypted Steps</h2>
-      <p>Encrypt your number of steps to solve the puzzle and let the contract check if it’s a new record.</p>
+      <h2>1️⃣ Submit Encrypted ELO</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Encrypt your chess rating (ELO) and store it privately on-chain.
+      </p>
 
-      <label>Steps taken (uint16)</label>
-      <input id="stepsInput" type="number" min="0" max="65535" value="42"/>
+      <label>Your ELO rating (uint16)</label>
+      <input id="ratingInput" type="number" min="0" max="65535" value="1800"/>
 
       <div class="row">
-        <button id="btnSubmitSteps" class="btn btn-success">Submit Steps</button>
-        <div id="stepsStatus" class="status" style="display:none;"></div>
+        <button id="btnSubmitRating" class="btn btn-success">Submit Rating</button>
+        <div id="ratingStatus" class="status" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- CHECK GATE -->
+    <section class="card">
+      <h2>2️⃣ Private Tournament Gate</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Encrypt a tournament rating threshold and check if you are allowed to join (admitted / rejected).
+      </p>
+
+      <label>Tournament ID (string → bytes32)</label>
+      <input id="tournamentIdInput" type="text" value="private-open-1800"/>
+
+      <label>Rating threshold (uint16)</label>
+      <input id="thresholdInput" type="number" min="0" max="65535" value="1800"/>
+
+      <div class="row">
+        <button id="btnCheckGate" class="btn btn-secondary">Check Gate (Homomorphic)</button>
+        <div id="gateStatus" class="status" style="display:none;"></div>
       </div>
 
       <pre id="flagHandleOutput" style="display:none;">—</pre>
     </section>
 
+    <!-- DECRYPT FLAG -->
     <section class="card">
-      <h2>2️⃣ Make Public & Decrypt Flag</h2>
-      <p>Make your last “new record” flag public and decrypt it via Relayer.</p>
+      <h2>3️⃣ Make Public & Decrypt Gate Flag</h2>
+      <p style="color:#9ca3af;font-size:14px;">
+        Make your gate result public and decrypt it via Relayer.
+      </p>
 
       <div class="row">
-        <button id="btnGetHandle" class="btn btn-secondary">Get My Flag Handle</button>
-        <button id="btnMakePublic" class="btn">Make My Flag Public</button>
-        <button id="btnDecrypt" class="btn btn-success">Decrypt Flag</button>
+        <button id="btnGetHandle" class="btn btn-secondary">Get Gate Handle</button>
+        <button id="btnMakePublic" class="btn">Make Gate Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Gate Flag</button>
       </div>
 
       <div id="decryptStatus" class="status" style="display:none;"></div>
-      <div id="flagResult" class="match-result" style="display:none;"></div>
+      <div id="gateResult" class="match-result" style="display:none;"></div>
     </section>
 
     <footer>Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6</footer>

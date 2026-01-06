@@ -161,11 +161,11 @@ const DAPPS = [
     description: "Фільтрація клієнтів за зашифрованими атрибутами без доступу до сирих даних CRM."
   },
   {
-    slug: "80_OpenSourceRewards",
-    title: "80 · Open Source Rewards",
-    tag: "OSS Rewards",
-    chain: "FHEVM · OSS",
-    description: "Система винагород open-source контриб'юторам з приватною логікою розрахунку бонусів."
+    slug: "80_EncryptedCertifications",
+    title: "80 · Encrypted Certifications",
+    tag: "Certifications",
+    chain: "FHEVM · Education",
+    description: "Система сертифікацій з повністю зашифрованими результатами та відомостями."
   },
   {
     slug: "81_TinderDAOPrivateMatch",

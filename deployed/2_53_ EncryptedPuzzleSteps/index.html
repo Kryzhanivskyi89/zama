@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Encrypted Puzzle Steps — Zama FHEVM</title>
+<link rel="stylesheet" href="./index.css" />
+ 
+</head>
+
+<body>
+  <!-- HTML НЕ ЗМІНЕНО -->
+  <div class="container">
+    <header>
+      <h1>🧩 Encrypted Puzzle Steps</h1>
+      <button id="btnConnect" class="btn">Connect Wallet</button>
+    </header>
+
+    <section class="card">
+      <h2>1️⃣ Submit Encrypted Steps</h2>
+      <p>Encrypt your number of steps to solve the puzzle and let the contract check if it’s a new record.</p>
+
+      <label>Steps taken (uint16)</label>
+      <input id="stepsInput" type="number" min="0" max="65535" value="42"/>
+
+      <div class="row">
+        <button id="btnSubmitSteps" class="btn btn-success">Submit Steps</button>
+        <div id="stepsStatus" class="status" style="display:none;"></div>
+      </div>
+
+      <pre id="flagHandleOutput" style="display:none;">—</pre>
+    </section>
+
+    <section class="card">
+      <h2>2️⃣ Make Public & Decrypt Flag</h2>
+      <p>Make your last “new record” flag public and decrypt it via Relayer.</p>
+
+      <div class="row">
+        <button id="btnGetHandle" class="btn btn-secondary">Get My Flag Handle</button>
+        <button id="btnMakePublic" class="btn">Make My Flag Public</button>
+        <button id="btnDecrypt" class="btn btn-success">Decrypt Flag</button>
+      </div>
+
+      <div id="decryptStatus" class="status" style="display:none;"></div>
+      <div id="flagResult" class="match-result" style="display:none;"></div>
+    </section>
+
+    <footer>Built with ❤️ & Zama FHEVM · Relayer SDK 0.3.0-5 · Ethers v6</footer>
+  </div>
+
+<script type="module" src="./index.js"></script>
+ 
+</body>
+</html>
