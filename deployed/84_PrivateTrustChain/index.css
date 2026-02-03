@@ -1,0 +1,8 @@
+  body { background: linear-gradient(135deg, #022c22, #065f46, #0d9488); font-family: 'Inter', sans-serif; color: #e0f2f1; min-height:100vh; padding-bottom:60px; }
+  .cyber-box { border: 2px solid rgba(0,255,204,0.4); border-radius:18px; padding:22px; background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
+  input { padding:12px; border-radius:12px; margin-bottom:8px; background: rgba(255,255,255,0.2); border:1px solid rgba(0,255,200,0.2); color:#e0f2f1; width:100%; }
+  #log { height:160px; overflow-y:auto; background: rgba(255,255,255,0.15); padding:12px; border-radius:14px; color:white; font-size:13px; white-space:pre-wrap; }
+  .btn { padding:12px 18px; border-radius:14px; font-weight:600; cursor:pointer; transition:0.2s; width:100%; border:none; }
+  .btn-connect { background:#0d9488; }
+  .btn-primary { background:#14b8a6; }
+  .btn-yellow { background:#fbbf24; color:#78350f; }
